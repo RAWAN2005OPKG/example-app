@@ -1,0 +1,124 @@
+@import url('./color.css');
+    
+             /* إعادة تعيين الأساسيات */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Tahoma", Arial, sans-serif;
+}
+
+/* خلفية متدرجة */
+body {
+  background: linear-gradient(135deg, #004d7a, #008793, #e66706, #df4e05);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  direction: rtl;
+}
+
+/* حركة الخلفية */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* الحاوية */
+.container {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* الشعار */
+.logo img {
+  width: 100px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+/* عنوان الترحيب */
+.welcome {
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+/* رسالة الخطأ */
+.error {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff4d4d;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* حقول الإدخال */
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.login-form input:focus {
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+/* زر تسجيل الدخول */
+.login-form button {
+  background: linear-gradient(135deg, #87a8d0, #707ab5, #c95032);
+  background-size: 300% 300%;
+  animation: moveGradient 6s ease infinite;
+  border: none;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+@keyframes moveGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.login-form button:hover {
+  filter: brightness(1.1);
+}
+
+.register-link {
+  margin-top: 15px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.register-link a {
+  color: #ffe97f;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}

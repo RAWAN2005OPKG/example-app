@@ -1,0 +1,1759 @@
+/*
+==============================================
+          *** ملف التنسيقات الموحد ***
+==============================================
+
+تم إنشاء هذا الملف لتوحيد جميع التنسيقات في المشروع،
+وتطبيق تصميم عصري داكن (Dark Mode) متجاوب مع جميع الشاشات.
+
+==============================================
+*/
+
+/* ------------------- المتغيرات العامة ------------------- */
+:root {
+    --primary-color: #1d9bf0;      /* أزرق تويتر - للروابط والأزرار الرئيسية */
+    --secondary-color: #34495e;    /* أزرق داكن - للأزرار الثانوية */
+    --accent-color: #007bff;       /* لون إضافي للتمييز */
+    --success-color: #00ba7c;      /* أخضر - للنجاح والإيداع */
+    --warning-color: #ffc82c;      /* أصفر - للتحذيرات والشيكات */
+    --danger-color: #f91880;       /* أحمر/وردي - للحذف والأخطاء والسحب */
+    --info-color: #3498db;         /* أزرق فاتح - للمعلومات */
+
+    --bg-primary: #000000;         /* الخلفية الرئيسية (أسود) */
+    --bg-secondary: #16181c;       /* خلفية العناصر (مثل البطاقات) */
+    --bg-tertiary: #212327;        /* خلفية أكثر قتامة قليلاً */
+    --bg-sidebar: #1a1a2e;         /* خلفية الشريط الجانبي */
+
+    --text-primary: #e7e9ea;       /* لون النص الأساسي (أبيض فاتح) */
+    --text-secondary: #71767b;     /* لون النص الثانوي (رمادي) */
+    --text-muted: #8898aa;         /* لون النص الخافت */
+
+    --border-color: #323641;       /* لون الحدود */
+
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.4);
+
+    --border-radius-sm: 6px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+
+    --transition-fast: 0.2s ease-in-out;
+    --transition-normal: 0.3s ease-in-out;
+
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 70px;
+}
+
+/* ------------------- التنسيقات الأساسية (Global) ------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: \'Cairo\', sans-serif; /* استخدام خط Cairo لكل المشروع */
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    direction: rtl; /* دعم اللغة العربية */
+    font-size: 16px;
+    display: flex; /* لجعل الشريط الجانبي والمحتوى بجانب بعضهما */
+    min-height: 100vh;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--info-color);
+}
+
+/* ------------------- الشريط الجانبي (Sidebar) ------------------- */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-sidebar);
+    color: var(--text-primary);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    transition: width var(--transition-normal);
+    border-left: 1px solid var(--border-color);
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header .logo-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .sidebar-header .logo-text {
+    display: none;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.sidebar-nav a.active {
+    background-color: rgba(29, 155, 240, 0.1);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.sidebar-nav a i {
+    font-size: 1.2rem;
+    margin-left: 1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar.collapsed .sidebar-nav a span {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-nav a {
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+/* ------------------- تنسيق المحتوى الرئيسي والتخطيط ------------------- */
+.main-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* ------------------- ترويسة الصفحة (Page Header) ------------------- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.page-header h1 i {
+    color: var(--primary-color);
+    margin-left: 1rem;
+}
+
+.page-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 600px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* ------------------- الأزرار (Buttons) ------------------- */
+.btn, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-add-new, .btn-submit, .btn-export, .btn-action {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none; /* لضمان تطبيقه على عناصر a */
+}
+
+.btn:hover, .btn-primary:hover, .btn-secondary:hover, .btn-success:hover, .btn-danger:hover, .btn-add-new:hover, .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary, .btn-add-new, .btn-submit {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: #ffffff;
+}
+
+.btn-success, .btn-export {
+    background-color: var(--success-color);
+    color: #ffffff;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: #ffffff;
+}
+
+.btn-action {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+}
+
+.btn-action:hover {
+    color: var(--primary-color);
+    background-color: var(--bg-tertiary);
+}
+
+/* ------------------- النماذج (Forms) ------------------- */
+.form-container, .forms-container {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.form-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-header h1, .form-header h2, .form-header h3 {
+    color: var(--text-primary);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--border-radius-md);
+    border-left: 4px solid var(--primary-color);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-group label.required::after {
+    content: \' *\';
+    color: var(--danger-color);
+    margin-right: 3px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+}
+
+input[readonly] {
+    background-color: var(--bg-tertiary);
+    cursor: not-allowed;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ------------------- الجداول (Tables) ------------------- */
+.table-container {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+}
+
+.table-controls, .container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table, table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* لضمان عدم تكسر الجدول على الشاشات الصغيرة قبل ظهور الشريط */
+}
+
+.data-table th, .data-table td, table th, table td {
+    padding: 1rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.data-table thead th, table thead th {
+    background-color: var(--bg-tertiary);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.data-table tbody tr:hover, table tbody tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
+/* ------------------- البطاقات (Cards) ------------------- */
+.kpi-grid, .dashboard, .summary-cards, .sub-boxes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card, .summary-card, .sub-box, .project-card, .balance-card {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-normal);
+}
+
+.kpi-card:hover, .summary-card:hover, .sub-box:hover, .project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.kpi-card .label, .summary-card .card-title {
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.kpi-card .value, .summary-card .card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.kpi-card .value.currency, .kpi-card .value.remaining {
+    color: var(--success-color);
+}
+
+.kpi-card .value.remaining {
+    color: var(--danger-color);
+}
+
+.project-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card-header h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+}
+
+.project-card-footer {
+    margin-top: auto; /* لدفع الحاشية لأسفل البطاقة */
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ------------------- النوافذ المنبثقة (Modals) ------------------- */
+.modal {
+    display: none; /* يتم التحكم به عبر JS */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    pointer-events: none;
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.95);
+    transition: transform var(--transition-fast);
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* ------------------- التبويبات (Tabs) ------------------- */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: all var(--transition-fast);
+}
+
+.tab-button.active, .tab-button:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ------------------- كلاسات مساعدة (Utility Classes) ------------------- */
+.hidden {
+    display: none !important;
+}
+
+.text-success { color: var(--success-color); }
+.text-danger { color: var(--danger-color); }
+.text-warning { color: var(--warning-color); }
+
+/* ------------------- التجاوب مع الشاشات (Responsive Design) ------------------- */
+@media (max-width: 992px) {
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-left: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem;
+    }
+    .sidebar.collapsed {
+        width: 100%;
+    }
+    .sidebar-header {
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+    .sidebar-header .logo-text {
+        display: block;
+    }
+    .sidebar-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .sidebar-nav li {
+        margin: 0.25rem;
+    }
+    .sidebar-nav a {
+        padding: 0.5rem 1rem;
+    }
+    .sidebar-nav a span {
+        display: inline;
+    }
+    .sidebar-nav a i {
+        margin-left: 0.5rem;
+    }
+
+    .main-content, .container {
+        padding: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-grid, .dashboard, .summary-cards, .sub-boxes-grid, .actions-grid {
+        gap: 1rem;
+        grid-template-columns: 1fr;
+    }
+
+    .data-table, table {
+        font-size: 0.9rem;
+    }
+
+    .data-table th, .data-table td, table th, table td {
+        padding: 0.75rem;
+    }
+
+    .report-container {
+        grid-template-columns: 1fr;
+    }
+
+    .top-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    .header-right {
+        justify-content: center;
+    }
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .card, .recent-operations {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-add-new, .btn-submit {
+        width: 100%;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-btn {
+        width: 100%;
+    }
+    .alert-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .alert-icon {
+        margin-bottom: 0.5rem;
+    }
+    .alert-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* ------------------- تنسيقات إضافية من الملفات الأصلية ------------------- */
+/* تم استخلاص هذه التنسيقات من ملفات Blade الأصلية وتكييفها مع التصميم الجديد */
+
+.search-container {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.search-container h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-box {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.search-btn:hover {
+    background-color: var(--info-color);
+}
+
+.search-results {
+    margin-top: 1rem;
+    background-color: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.contacts-management {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.contacts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.contacts-header h3 {
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.contacts-management p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.main-kpi-card {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-lg);
+}
+
+.sub-boxes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* تعديل حجم البطاقات الفرعية */
+}
+
+.sub-box {
+    text-align: center;
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.sub-box .icon {
+    font-size: 2.5rem;
+    color: var(--primary-color); /* يمكن تخصيص اللون لكل أيقونة */
+}
+
+.sub-box .label {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.actions-container {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.actions-container h2 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.transfers-container {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.transfers-container h2 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.transfers-container .table-wrapper {
+    margin-top: 1rem;
+}
+
+/* Modal specific styles */
+.modal-content h2 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-content .form-group {
+    margin-bottom: 1rem;
+}
+
+.modal-content .form-actions {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 1.5rem;
+    justify-content: center;
+}
+
+/* Alerts page specific styles */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    background-color: var(--bg-secondary);
+    padding: 15px;
+    border-radius: var(--border-radius-lg);
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.filter-btn.active, .filter-btn:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.alert-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-right: 5px solid var(--text-muted);
+    transition: all var(--transition-fast);
+    opacity: 1;
+}
+
+.alert-card.unread {
+    background-color: var(--bg-tertiary); /* لون أغمق قليلاً للتنبيهات غير المقروءة */
+}
+.alert-card.read {
+    opacity: 0.7;
+}
+.alert-card.type-danger { border-color: var(--danger-color); }
+.alert-card.type-warning { border-color: var(--warning-color); }
+.alert-card.type-info { border-color: var(--info-color); }
+.alert-card.type-success { border-color: var(--success-color); }
+
+.alert-icon {
+    font-size: 2rem;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.alert-icon.icon-danger { color: var(--danger-color); }
+.alert-icon.icon-warning { color: var(--warning-color); }
+.alert-icon.icon-info { color: var(--info-color); }
+.alert-icon.icon-success { color: var(--success-color); }
+
+.alert-content {
+    flex-grow: 1;
+}
+.alert-content p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+.alert-content .meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.alert-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+.action-btn:hover {
+    color: var(--primary-color);
+}
+
+/* Projects Grid */
+.projects-grid, .contracts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.project-card, .contract-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    border-top: 4px solid var(--primary-color);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover, .contract-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.project-card-header, .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-card-header h3, .card-header h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.project-card-header span, .card-header span {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.project-card-body, .card-body {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.metric-item .label {
+    color: var(--text-secondary);
+}
+
+.metric-item .value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.notes-box {
+    background-color: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.75rem;
+}
+
+.btn-delete {
+    background-color: var(--danger-color);
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+.no-projects, .no-contracts {
+    text-align: center;
+    padding: 3rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    grid-column: 1 / -1;
+    color: var(--text-secondary);
+}
+
+.no-projects i, .no-contracts i {
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.no-projects h2, .no-contracts h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.no-projects p, .no-contracts p {
+    font-size: 1rem;
+}
+
+/* Reports page specific styles */
+.report-section {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.report-section .container-title {
+    margin-bottom: 1.5rem;
+}
+
+.kpi-grid .kpi-card .icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.summary-table th, .summary-table td {
+    padding: 1rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.summary-table thead th {
+    background-color: var(--bg-tertiary);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.summary-table tbody tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
+/* Profit and Loss Report (salary_payments.blade.php) */
+.report-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.pnl-section {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.pnl-section .section-title {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.date-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.date-filters label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.date-filters input[type="date"] {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.pnl-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pnl-table th, .pnl-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pnl-table th {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+.pnl-table .item-label {
+    color: var(--text-secondary);
+}
+
+.pnl-table .item-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: left;
+}
+
+.pnl-table .total-row {
+    font-weight: 700;
+    background-color: var(--bg-tertiary);
+}
+
+.pnl-table .total-row .item-value {
+    color: var(--primary-color);
+}
+
+.expenses-section {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.expenses-section .section-title {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.expenses-section form .form-group {
+    margin-bottom: 1rem;
+}
+
+.expenses-section hr {
+    border-color: var(--border-color);
+    margin: 1.5rem 0;
+}
+
+.expenses-section h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+#expensesList {
+    list-style: none;
+    padding: 0;
+}
+
+#expensesList li {
+    background-color: var(--bg-tertiary);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+}
+
+/* Annual Report (years.blade.php) */
+.report-controls {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.report-controls label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.report-controls select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.annual-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.annual-kpi-grid .kpi-card {
+    text-align: center;
+}
+
+.annual-kpi-grid .kpi-card .value {
+    font-size: 2.2rem;
+}
+
+.annual-kpi-grid .kpi-card #kpiAnnualGrowth {
+    color: var(--info-color);
+}
+
+.data-table .total-row {
+    font-weight: 700;
+    background-color: var(--bg-tertiary);
+}
+
+.data-table .total-row td {
+    color: var(--primary-color);
+}
+
+/* Responsive adjustments for report-container */
+@media (max-width: 992px) {
+    .report-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Top Header (from container.blade.php) */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-primary);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.header-left h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.header-left p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.notifications {
+    position: relative;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.notification-btn:hover {
+    background: var(--bg-secondary);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    border: 1px solid var(--bg-primary);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.user-profile:hover {
+    background: var(--bg-secondary);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-tertiary); /* Placeholder background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.menu-toggle {
+    display: none; /* يتم التحكم به عبر JS */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+}
+
+.menu-toggle:hover {
+    background: var(--bg-secondary);
+}
+
+/* Dashboard Cards (from container.blade.php) */
+.dashboard-cards {
+    margin-bottom: 2rem;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--bg-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background-color: var(--bg-tertiary);
+    box-shadow: var(--shadow-xl);
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    background-color: rgba(29, 155, 240, 0.1);
+    margin-bottom: 1rem;
+    transition: all var(--transition-normal);
+}
+
+.card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+.warnings-card .card-icon {
+    color: var(--warning-color);
+    background-color: rgba(255, 200, 44, 0.1);
+}
+
+.card-content h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.card-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.card-change.positive { color: var(--success-color); }
+.card-change.negative { color: var(--danger-color); }
+.card-change.neutral { color: var(--warning-color); }
+
+/* Recent Operations Table (from container.blade.php) */
+.recent-operations {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    border: 1px solid var(--bg-tertiary);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.view-all-btn {
+    background: none;
+    color: var(--primary-color);
+    border: 1px solid var(--bg-tertiary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.view-all-btn:hover {
+    background: rgba(29, 155, 240, 0.1);
+}
+
+.operations-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.operations-table th,
+.operations-table td {
+    padding: 1rem;
+    text-align: right;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.operations-table th {
+    background: transparent;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.operations-table tr {
+    transition: all var(--transition-fast);
+}
+
+.operations-table tr:hover {
+    background: var(--bg-tertiary);
+}
+
+.operation-type, .status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.operation-type.sale, .status.completed {
+    background: rgba(0, 186, 124, 0.1);
+    color: var(--success-color);
+}
+
+.operation-type.expense, .status.pending {
+    background: rgba(249, 24, 128, 0.1);
+    color: var(--danger-color);
+}
+
+.operation-type.contract, .status.in-progress {
+    background: rgba(29, 155, 240, 0.1);
+    color: var(--info-color);
+}
+
+.amount.positive { color: var(--success-color); }
+.amount.negative { color: var(--danger-color); }
+.amount.neutral { color: var(--warning-color); }
+
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeInUp 0.6s ease-out; }
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+.card:nth-child(5) { animation-delay: 0.5s; }
+.card:nth-child(6) { animation-delay: 0.6s; }
+
+/* General layout for pages using main-content */
+.main-content.centered {
+    max-width: 900px;
+    margin: 40px auto;
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+/* Specific adjustments for forms within main-content.centered */
+.main-content.centered .form-container {
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.main-content.centered .form-section {
+    border-left: 4px solid var(--accent-color);
+}
+
+.main-content.centered .form-actions {
+    justify-content: center;
+}
+
+/* Media Queries for overall layout */
+@media (max-width: 1024px) {
+    body {
+        flex-direction: column; /* الشريط الجانبي فوق المحتوى */
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-left: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem;
+    }
+    .sidebar.collapsed {
+        width: 100%;
+    }
+    .sidebar-header {
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+    .sidebar-header .logo-text {
+        display: block;
+    }
+    .sidebar-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .sidebar-nav li {
+        margin: 0.25rem;
+    }
+    .sidebar-nav a {
+        padding: 0.5rem 1rem;
+    }
+    .sidebar-nav a span {
+        display: inline;
+    }
+    .sidebar-nav a i {
+        margin-left: 0.5rem;
+    }
+    .main-wrapper {
+        padding-top: 0;
+    }
+    .top-header {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content, .container {
+        padding: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-grid, .dashboard, .summary-cards, .sub-boxes-grid, .actions-grid {
+        gap: 1rem;
+        grid-template-columns: 1fr;
+    }
+
+    .data-table, table {
+        font-size: 0.9rem;
+    }
+
+    .data-table th, .data-table td, table th, table td {
+        padding: 0.75rem;
+    }
+
+    .report-container {
+        grid-template-columns: 1fr;
+    }
+
+    .top-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    .header-right {
+        justify-content: center;
+    }
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .card, .recent-operations {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-add-new, .btn-submit {
+        width: 100%;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-btn {
+        width: 100%;
+    }
+    .alert-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .alert-icon {
+        margin-bottom: 0.5rem;
+    }
+    .alert-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

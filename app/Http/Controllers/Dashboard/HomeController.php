@@ -28,9 +28,11 @@ class HomeController extends Controller
     public function index()
     {
         // 1. جلب الأرصدة الرئيسية باستخدام الخدمة المالية
+        $openingBalance = $this->financialService->getOpeningBalance();
         $totalCapital = $this->financialService->getTotalCapital();
         $totalCashBalance = $this->financialService->getCashBalance();
         $totalBankBalance = $this->financialService->getBankBalance();
+        $checksBalance = $this->financialService->getChecksBalance();
 
         // 2. إحصائيات سريعة
         $projectsCount = Project::count();
@@ -38,8 +40,8 @@ class HomeController extends Controller
 
         // 3. بيانات الرسم البياني لتوزيع السيولة
         $liquidityData = [
-            'labels' => ['رصيد الخزينة', 'رصيد البنوك'],
-            'data' => [$totalCashBalance, $totalBankBalance],
+            'labels' => ['الرصيد الأساسي', 'رصيد الخزينة', 'رصيد البنوك', 'الشيكات'],
+            'data' => [$openingBalance, $totalCashBalance, $totalBankBalance, $checksBalance],
         ];
 
         // 4. بيانات الرسم البياني للإيرادات والمصروفات الشهرية (آخر 6 أشهر)
@@ -51,9 +53,11 @@ class HomeController extends Controller
 
         // 6. إرسال كل البيانات إلى الواجهة
         return view('dashboard.home', [
+            'openingBalance' => $openingBalance,
             'totalCapital' => $totalCapital,
             'totalCashBalance' => $totalCashBalance,
             'totalBankBalance' => $totalBankBalance,
+            'checksBalance' => $checksBalance,
             'projectsCount' => $projectsCount,
             'activeProjectsCount' => $activeProjectsCount,
             'liquidityData' => json_encode($liquidityData),

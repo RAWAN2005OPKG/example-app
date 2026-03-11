@@ -89,9 +89,15 @@
     <!-- == القسم الأول: المبلغ الرئيسي (كما طلبت تماماً) == -->
     <!-- ================================================== -->
     <div class="row">
-        <div class="col-12">
+        <div class="col-lg-6 mb-4">
             <div class="main-capital-card">
-                <h1>إجمالي السيولة الحالية (المبلغ العام)</h1>
+                <h1>الرقم الأساسي من الإعدادات</h1>
+                <div class="display-4">{{ number_format($openingBalance, 2) }} ILS</div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="main-capital-card">
+                <h1>الإجمالي بعد الإضافات الحالية</h1>
                 <div class="display-4">{{ number_format($totalCapital, 2) }} ILS</div>
             </div>
         </div>
@@ -99,21 +105,28 @@
 
     <!-- ملخصات فرعية تحت المبلغ الرئيسي -->
     <div class="row">
-        <div class="col-lg-4 col-md-12 mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
             <div class="sub-stat-card">
                 <div class="icon text-success"><i class="fas fa-cash-register"></i></div>
                 <div class="title">رصيد الخزينة (الكاش)</div>
                 <div class="value text-dark">{{ number_format($totalCashBalance, 2) }} ILS</div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
             <div class="sub-stat-card">
                 <div class="icon text-info"><i class="fas fa-university"></i></div>
                 <div class="title">إجمالي أرصدة البنوك</div>
                 <div class="value text-dark">{{ number_format($totalBankBalance, 2) }} ILS</div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="sub-stat-card">
+                <div class="icon text-warning"><i class="fas fa-money-check-alt"></i></div>
+                <div class="title">إجمالي الشيكات</div>
+                <div class="value text-dark">{{ number_format($checksBalance, 2) }} ILS</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
             <div class="sub-stat-card">
                 <div class="icon text-warning"><i class="fas fa-project-diagram"></i></div>
                 <div class="title">المشاريع النشطة</div>
@@ -242,8 +255,8 @@ document.addEventListener("DOMContentLoaded", function( ) {
             labels: liquidityData.labels,
             datasets: [{
                 data: liquidityData.data,
-                backgroundColor: ['#1cc88a', '#36b9cc'],
-                hoverBackgroundColor: ['#17a673', '#2c9faf'],
+                backgroundColor: ['#f6c23e', '#1cc88a', '#36b9cc', '#858796'],
+                hoverBackgroundColor: ['#dda20a', '#17a673', '#2c9faf', '#60616f'],
                 hoverBorderColor: "rgba(234, 236, 244, 1)",
             }],
         },

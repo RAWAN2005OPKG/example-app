@@ -30,9 +30,7 @@ class CashTransactionController extends Controller
             return $transaction;
         })->reverse();
 
-        $totalIn = CashTransaction::where('type', 'in')->sum('amount_ils');
-        $totalOut = CashTransaction::where('type', 'out')->sum('amount_ils');
-        $currentBalance = $totalIn - $totalOut;
+        $currentBalance = (new \App\Services\FinancialService())->getCashBalance();
 
         return view('dashboard.cash.index', compact('transactionsWithBalance', 'currentBalance'));
     }

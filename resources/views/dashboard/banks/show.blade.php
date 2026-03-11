@@ -23,7 +23,7 @@
                     </div>
                     <div class="card-toolbar">
                         <span class="label label-lg font-weight-bold label-light-primary label-inline">
-                            الرصيد: {{ number_format($account->current_balance, 2) }} {{ $account->currency }}
+                            الرصيد: {{ number_format($account->resolved_balance, 2) }} {{ $account->currency }}
                         </span>
                     </div>
                 </div>

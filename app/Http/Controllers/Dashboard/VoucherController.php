@@ -162,13 +162,11 @@ class VoucherController extends Controller
         } elseif ($voucher->payment_method == 'bank_transfer') {
             if ($voucher->from_bank_account_id) {
                 $fromAccount = BankAccount::findOrFail($voucher->from_bank_account_id);
-                $fromAccount->current_balance -= $this->getAmountInTargetCurrency($voucher, $fromAccount->currency);
-                $fromAccount->save();
+                $fromAccount->applyBalanceDelta(-1 * (float) $this->getAmountInTargetCurrency($voucher, $fromAccount->currency));
             }
             if ($voucher->to_bank_account_id) {
                 $toAccount = BankAccount::findOrFail($voucher->to_bank_account_id);
-                $toAccount->current_balance += $this->getAmountInTargetCurrency($voucher, $toAccount->currency);
-                $toAccount->save();
+                $toAccount->applyBalanceDelta((float) $this->getAmountInTargetCurrency($voucher, $toAccount->currency));
             }
         }
     }
@@ -184,13 +182,11 @@ class VoucherController extends Controller
         } elseif ($voucher->payment_method == 'bank_transfer') {
             if ($voucher->from_bank_account_id) {
                 $fromAccount = BankAccount::findOrFail($voucher->from_bank_account_id);
-                $fromAccount->current_balance += $this->getAmountInTargetCurrency($voucher, $fromAccount->currency);
-                $fromAccount->save();
+                $fromAccount->applyBalanceDelta((float) $this->getAmountInTargetCurrency($voucher, $fromAccount->currency));
             }
             if ($voucher->to_bank_account_id) {
                 $toAccount = BankAccount::findOrFail($voucher->to_bank_account_id);
-                $toAccount->current_balance -= $this->getAmountInTargetCurrency($voucher, $toAccount->currency);
-                $toAccount->save();
+                $toAccount->applyBalanceDelta(-1 * (float) $this->getAmountInTargetCurrency($voucher, $toAccount->currency));
             }
         }
     }

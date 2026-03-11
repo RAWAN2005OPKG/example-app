@@ -59,6 +59,11 @@ class BankAccountController extends Controller
             'current_balance' => 'nullable|numeric|min:0', // اسم الحقل الصحيح
         ]);
 
+        $initialBalance = (float) ($validated['current_balance'] ?? 0);
+        $validated['opening_balance'] = $initialBalance;
+        $validated['balance'] = $initialBalance;
+        $validated['current_balance'] = $initialBalance;
+
         BankAccount::create($validated);
 
         return redirect()->route('dashboard.bank-accounts.index')->with('success', 'تم إضافة الحساب البنكي بنجاح.');
@@ -116,7 +121,7 @@ class BankAccountController extends Controller
     public function destroy(BankAccount $bankAccount)
     {
         // يمكنك إضافة شرط هنا لمنع حذف حساب يحتوي على حركات أو رصيد
-        if ($bankAccount->transactions()->exists() || $bankAccount->current_balance > 0) {
+        if ($bankAccount->transactions()->exists() || abs($bankAccount->resolved_balance) > 0.01) {
             return back()->with('error', 'لا يمكن حذف حساب بنكي يحتوي على حركات أو رصيد.');
         }
 

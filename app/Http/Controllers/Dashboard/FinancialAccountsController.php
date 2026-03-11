@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BankAccount;
 use App\Models\CashSafe;
 use App\Models\Check;
+use App\Services\FinancialService;
 use Illuminate\Http\Request;
 
 class FinancialAccountsController extends Controller
@@ -37,10 +38,26 @@ class FinancialAccountsController extends Controller
         $checks = $checksQuery->paginate(10, ['*'], 'checks_page');
 
         // حساب الإجماليات باستخدام FinancialService لضمان الدقة
-        $financialService = new \App\Services\FinancialService();
+        $financialService = new FinancialService();
+        $openingBalance = $financialService->getOpeningBalance();
         $totalCashBalance = $financialService->getCashBalance();
         $totalBankBalance = $financialService->getBankBalance();
-        $totalOverallBalance = $financialService->getTotalCapital();
+        $totalChecksBalance = $financialService->getChecksBalance();
+        $totalCapital = $financialService->getTotalCapital();
+
+        $cashSafes->transform(function ($safe) {
+            $safe->display_balance = (float) $safe->balance;
+            return $safe;
+        });
+
+        if ($cashSafes->count() === 1 && abs($totalCashBalance - (float) $cashSafes->first()->balance) > 0.01) {
+            $cashSafes->first()->display_balance = $totalCashBalance;
+        }
+
+        $bankAccounts->transform(function (BankAccount $account) {
+            $account->display_balance = $account->resolved_balance;
+            return $account;
+        });
 
         // حساب توزيع الشيكات حسب الحالة للرسم البياني
         $checkStats = [
@@ -54,9 +71,11 @@ class FinancialAccountsController extends Controller
             'cashSafes',
             'bankAccounts',
             'checks',
+            'openingBalance',
             'totalCashBalance',
             'totalBankBalance',
-            'totalOverallBalance',
+            'totalChecksBalance',
+            'totalCapital',
             'checkStats'
         ));
     }

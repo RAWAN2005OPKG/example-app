@@ -72,7 +72,7 @@ class ExpenseController extends Controller
                     'currency' => $bankAccount->currency,
                     'details' => 'مصروف رقم ' . $expense->id . ': ' . $expense->payee,
                 ]);
-                $bankAccount->decrement('balance', $expense->amount);
+                $bankAccount->applyBalanceDelta(-1 * (float) $expense->amount);
             }
 
             $admins = User::where('role', 'admin')->get();
@@ -160,7 +160,7 @@ class ExpenseController extends Controller
                 'currency' => $bankAccount->currency,
                 'details' => 'مصروف رقم ' . $expense->id . ': ' . $expense->payee,
             ]);
-            $bankAccount->decrement('balance', $expense->amount);
+            $bankAccount->applyBalanceDelta(-1 * (float) $expense->amount);
         }
     }
 
@@ -175,7 +175,7 @@ class ExpenseController extends Controller
             if ($transaction) {
                 $bankAccount = BankAccount::find($transaction->bank_account_id);
                 if ($bankAccount) {
-                    $bankAccount->increment('balance', $transaction->amount);
+                    $bankAccount->applyBalanceDelta((float) $transaction->amount);
                 }
                 $transaction->delete();
             }

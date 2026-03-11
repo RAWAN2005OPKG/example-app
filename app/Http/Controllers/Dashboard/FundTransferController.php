@@ -48,14 +48,23 @@ class FundTransferController extends Controller
         try {
             // خصم المبلغ من الحساب المصدر
             $fromAccount = $this->getAccountModel($fromType, $fromId);
-            if ($fromAccount->balance < $amount) {
+            $fromBalance = $fromAccount instanceof BankAccount ? $fromAccount->resolved_balance : (float) $fromAccount->balance;
+            if ($fromBalance < $amount) {
                 throw new \Exception('الرصيد في الحساب المصدر غير كافٍ لإتمام عملية التحويل.');
             }
-            $fromAccount->decrement('balance', $amount);
+            if ($fromAccount instanceof BankAccount) {
+                $fromAccount->applyBalanceDelta(-1 * $amount);
+            } else {
+                $fromAccount->decrement('balance', $amount);
+            }
 
             // إضافة المبلغ إلى الحساب الهدف
             $toAccount = $this->getAccountModel($toType, $toId);
-            $toAccount->increment('balance', $amount);
+            if ($toAccount instanceof BankAccount) {
+                $toAccount->applyBalanceDelta($amount);
+            } else {
+                $toAccount->increment('balance', $amount);
+            }
 
             // تسجيل عملية التحويل
             FundTransfer::create([

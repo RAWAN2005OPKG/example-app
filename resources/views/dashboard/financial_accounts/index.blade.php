@@ -320,15 +320,20 @@
             <h1>Executive Terminal</h1>
         </div>
         <div class="text-left">
-            <div class="terminal-meta">إجمالي السيولة الموحدة</div>
+            <div class="terminal-meta">إجمالي الرصيد العام (الأساسي + الحالي)</div>
             <div class="font-weight-bold" style="font-size: 1.8rem;">
-                 {{ number_format($totalCashBalance + $totalBankBalance + $totalOverallBalance, 2) }} <span class="currency">ILS</span>
+                 {{ number_format($totalCapital, 2) }} <span class="currency">ILS</span>
             </div>
         </div>
     </header>
 
     <!-- KPI Grid -->
     <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">الرصيد الأساسي من الإعدادات</div>
+            <div class="kpi-value"> {{ number_format($openingBalance, 2) }} <span class="currency">ILS</span></div>
+            <div class="terminal-meta"><i class="fas fa-circle text-primary ml-2"></i> قيمة البداية المعتمدة</div>
+        </div>
         <div class="kpi-card cash">
             <div class="kpi-label">السيولة النقدية (الخزائن)</div>
             <div class="kpi-value"> {{ number_format($totalCashBalance, 2) }} <span class="currency">ILS</span></div>
@@ -341,7 +346,7 @@
         </div>
         <div class="kpi-card checks">
             <div class="kpi-label">الأصول العائمة (الشيكات)</div>
-            <div class="kpi-value"> {{ number_format($totalOverallBalance, 2) }} <span class="currency">ILS</span></div>
+            <div class="kpi-value"> {{ number_format($totalChecksBalance, 2) }} <span class="currency">ILS</span></div>
             <div class="terminal-meta"><i class="fas fa-circle text-warning ml-2"></i> {{ $checkStats['in_wallet'] + $checkStats['under_collection'] }} قيد التحصيل</div>
         </div>
     </div>
@@ -373,7 +378,7 @@
                         <tr>
                             <td class="font-weight-bold">{{ $safe->name }}</td>
                             <td><span class="status-pill">{{ $safe->currency }}</span></td>
-                            <td class="font-weight-bold" style="font-size: 1.1rem;">{{ number_format($safe->balance, 2) }}</td>
+                            <td class="font-weight-bold" style="font-size: 1.1rem;">{{ number_format($safe->display_balance ?? $safe->balance, 2) }}</td>
                             <td>
                                 @if($safe->is_active)
                                     <span class="text-success"><i class="fas fa-check-circle ml-2"></i> متصل</span>
@@ -407,7 +412,7 @@
                         <tr>
                             <td>{{ $account->bank_name }}</td>
                             <td class="font-weight-bold">{{ $account->account_number }}</td>
-                            <td class="font-weight-bold text-info">{{ number_format($account->balance, 2) }}</td>
+                            <td class="font-weight-bold text-info">{{ number_format($account->display_balance ?? $account->resolved_balance, 2) }}</td>
                             <td>{{ $account->currency }}</td>
                             <td><span class="status-pill text-success">مؤمن</span></td>
                         </tr>

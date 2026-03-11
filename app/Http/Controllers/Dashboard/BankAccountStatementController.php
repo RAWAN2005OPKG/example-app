@@ -58,9 +58,9 @@ class BankAccountStatementController extends Controller
 
             // 2. تحديث رصيد الحساب البنكي
             if ($validated['type'] == 'deposit') {
-                $bankAccount->increment('current_balance', $validated['amount']);
+                $bankAccount->applyBalanceDelta((float) $validated['amount']);
             } else { // withdrawal, transfer, personal_withdrawal
-                $bankAccount->decrement('current_balance', $validated['amount']);
+                $bankAccount->applyBalanceDelta(-1 * (float) $validated['amount']);
             }
         });
 

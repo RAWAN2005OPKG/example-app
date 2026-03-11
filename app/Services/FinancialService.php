@@ -4,6 +4,7 @@ namespace App\Services;
 
 // 1. استيراد كل الموديلات التي ستدخل في الحسابات
 use App\Models\Setting;
+use App\Models\CashSafe;
 use App\Models\CashTransaction;
 use App\Models\BankAccount;
 use App\Models\Project;
@@ -17,13 +18,25 @@ use App\Models\WaliVoucher;
 
 class FinancialService
 {
+    public function getOpeningBalance(): float
+    {
+        $openingBalance = Setting::where('key', 'opening_balance')->value('value');
+
+        if ($openingBalance !== null) {
+            return (float) $openingBalance;
+        }
+
+        return (float) (Setting::where('key', 'total_budget')->value('value') ?? 0);
+    }
+
     public function getTotalCapital(): float
     {
-        $checksInWallet = $this->getChecksInWalletValue(); // **تمت إضافته**
+        return $this->getOpeningBalance() + $this->getCurrentLiquidityBalance();
+    }
 
-        // إجمالي السيولة هو ما تملكه نقداً وفي البنوك، بالإضافة إلى الشيكات التي في محفظتك
-        // The user asked to remove Cash & Banks from this specific total and keep them only on their individual pages.
-        return $checksInWallet; // Removed $cashBalance + $bankBalance
+    public function getCurrentLiquidityBalance(): float
+    {
+        return $this->getCashBalance() + $this->getBankBalance() + $this->getChecksBalance();
     }
 
     /**
@@ -33,7 +46,11 @@ class FinancialService
      */
     public function getCashBalance(): float
     {
-        return (float) \App\Models\CashSafe::where('is_active', true)->sum('balance');
+        $cashSafesBalance = (float) CashSafe::where('is_active', true)->sum('balance');
+        $transactionsNet = (float) CashTransaction::where('type', 'in')->sum('amount_ils')
+            - (float) CashTransaction::where('type', 'out')->sum('amount_ils');
+
+        return abs($transactionsNet) >= 0.01 ? $transactionsNet : $cashSafesBalance;
     }
 
     /**
@@ -43,7 +60,14 @@ class FinancialService
      */
     public function getBankBalance(): float
     {
-        return (float) BankAccount::where('is_active', true)->sum('balance');
+        return (float) BankAccount::where('is_active', true)
+            ->get()
+            ->sum(fn (BankAccount $account) => $account->resolved_balance);
+    }
+
+    public function getChecksBalance(): float
+    {
+        return $this->getChecksInWalletValue();
     }
 
     /**
@@ -92,8 +116,7 @@ class FinancialService
      */
     public function getLegacyCurrentBalance(): float
     {
-        $initialBudgetSetting = Setting::where('key', 'total_budget')->first();
-        $balance = $initialBudgetSetting ? (float) $initialBudgetSetting->value : 0;
+        $balance = $this->getOpeningBalance();
 
         // إضافة الإيرادات
         $balance += Payment::where('type', 'in')->sum('amount_ils');

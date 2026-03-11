@@ -75,7 +75,7 @@
                             <td>{{ $account->account_name }}</td>
                             <td>{{ $account->account_number }}</td>
                             {{-- التصحيح 2: استخدام اسم العمود الصحيح للرصيد --}}
-                            <td class="font-weight-bold">{{ number_format($account->current_balance, 2) }} {{ $account->currency }}</td>
+                            <td class="font-weight-bold">{{ number_format($account->resolved_balance, 2) }} {{ $account->currency }}</td>
                             <td>
                                 @if($account->is_active)
                                     <span class="label label-lg font-weight-bold label-light-success label-inline">نشط</span>

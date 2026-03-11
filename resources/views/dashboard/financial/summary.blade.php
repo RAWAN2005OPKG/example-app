@@ -255,6 +255,16 @@
     <!-- Essential Metrics -->
     <div class="metrics-grid">
         <div class="metric-card">
+            <div class="metric-label">الرصيد الأساسي من الإعدادات</div>
+            <div class="metric-value">{{ number_format($openingBalance, 2) }} <span class="metric-meta mr-2" style="font-size: 1rem; color: var(--terminal-muted);">ILS</span></div>
+            <div class="metric-trend text-info">BASELINE ACTIVE</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">إجمالي الرصيد بعد الإضافات</div>
+            <div class="metric-value text-info">{{ number_format($totalCapital, 2) }} <span class="metric-meta mr-2" style="font-size: 1rem; color: var(--terminal-muted);">ILS</span></div>
+            <div class="metric-trend text-info">UNIFIED LIQUIDITY</div>
+        </div>
+        <div class="metric-card">
             <div class="metric-label">إجمالي العوائد التشغيلية</div>
             <div class="metric-value">{{ number_format($totalRevenue, 2) }} <span class="metric-meta mr-2" style="font-size: 1rem; color: var(--terminal-muted);">ILS</span></div>
             <div class="metric-trend text-success"><i class="fas fa-arrow-up ml-1"></i> 12.5%</div>

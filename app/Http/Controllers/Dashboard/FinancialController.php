@@ -14,6 +14,8 @@ class FinancialController extends Controller
     public function summary()
     {
         $financialService = new \App\Services\FinancialService();
+        $openingBalance = $financialService->getOpeningBalance();
+        $totalCapital = $financialService->getTotalCapital();
 
         // 1. بطاقات الإحصائيات الرئيسية
         $totalRevenue = SaleInvoice::sum('total_amount') ?: 0;
@@ -57,6 +59,8 @@ class FinancialController extends Controller
         return view('dashboard.financial.summary', compact(
             'totalRevenue',
             'totalExpenses',
+            'openingBalance',
+            'totalCapital',
             'netProfit',
             'netCashFlow',
             'profitMargin',

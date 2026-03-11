@@ -97,19 +97,19 @@ public function store(Request $request)
 
         // تحديث الأرصدة
         if ($validated['type'] === 'deposit') {
-            BankAccount::find($validated['bank_account_id'])->increment('balance', $validated['amount']);
+            BankAccount::findOrFail($validated['bank_account_id'])->applyBalanceDelta((float) $validated['amount']);
         }
         elseif ($validated['type'] === 'withdrawal') {
-            BankAccount::find($validated['bank_account_id'])->decrement('balance', $validated['amount']);
+            BankAccount::findOrFail($validated['bank_account_id'])->applyBalanceDelta(-1 * (float) $validated['amount']);
         }
         elseif ($validated['type'] === 'transfer') {
             $fromAccount = BankAccount::find($validated['from_account_id']);
             $toAccount = BankAccount::find($validated['to_account_id']);
 
             // تحديث رصيد الحساب المرسل
-            $fromAccount->decrement('balance', $validated['amount']);
+            $fromAccount->applyBalanceDelta(-1 * (float) $validated['amount']);
             // تحديث رصيد الحساب المستقبل
-            $toAccount->increment('balance', $validated['amount']);
+            $toAccount->applyBalanceDelta((float) $validated['amount']);
 
             // تحديث عملة الحركة المسجلة (للدقة في حالة التحويل)
             // نفترض أن عملة التحويل هي عملة الحساب المرسل
@@ -164,22 +164,30 @@ public function store(Request $request)
         try {
             // الخطوة 1: عكس أثر العملية القديمة على الأرصدة
             if ($bankTransaction->type === 'deposit') {
-                if($bankTransaction->bank_account_id) BankAccount::find($bankTransaction->bank_account_id)->decrement('balance', $bankTransaction->amount);
+                if ($bankTransaction->bank_account_id && ($account = BankAccount::find($bankTransaction->bank_account_id))) {
+                    $account->applyBalanceDelta(-1 * (float) $bankTransaction->amount);
+                }
             } elseif ($bankTransaction->type === 'withdrawal') {
-                if($bankTransaction->bank_account_id) BankAccount::find($bankTransaction->bank_account_id)->increment('balance', $bankTransaction->amount);
+                if ($bankTransaction->bank_account_id && ($account = BankAccount::find($bankTransaction->bank_account_id))) {
+                    $account->applyBalanceDelta((float) $bankTransaction->amount);
+                }
             } elseif ($bankTransaction->type === 'transfer') {
-                if($bankTransaction->from_account_id) BankAccount::find($bankTransaction->from_account_id)->increment('balance', $bankTransaction->amount);
-                if($bankTransaction->to_account_id) BankAccount::find($bankTransaction->to_account_id)->decrement('balance', $bankTransaction->amount);
+                if ($bankTransaction->from_account_id && ($fromAccount = BankAccount::find($bankTransaction->from_account_id))) {
+                    $fromAccount->applyBalanceDelta((float) $bankTransaction->amount);
+                }
+                if ($bankTransaction->to_account_id && ($toAccount = BankAccount::find($bankTransaction->to_account_id))) {
+                    $toAccount->applyBalanceDelta(-1 * (float) $bankTransaction->amount);
+                }
             }
 
             // الخطوة 2: تطبيق أثر العملية الجديدة على الأرصدة
             if ($validated['type'] === 'deposit') {
-                BankAccount::find($validated['bank_account_id'])->increment('balance', $validated['amount']);
+                BankAccount::findOrFail($validated['bank_account_id'])->applyBalanceDelta((float) $validated['amount']);
             } elseif ($validated['type'] === 'withdrawal') {
-                BankAccount::find($validated['bank_account_id'])->decrement('balance', $validated['amount']);
+                BankAccount::findOrFail($validated['bank_account_id'])->applyBalanceDelta(-1 * (float) $validated['amount']);
             } elseif ($validated['type'] === 'transfer') {
-                BankAccount::find($validated['from_account_id'])->decrement('balance', $validated['amount']);
-                BankAccount::find($validated['to_account_id'])->increment('balance', $validated['amount']);
+                BankAccount::findOrFail($validated['from_account_id'])->applyBalanceDelta(-1 * (float) $validated['amount']);
+                BankAccount::findOrFail($validated['to_account_id'])->applyBalanceDelta((float) $validated['amount']);
             }
 
             // الخطوة 3: تحديث سجل الحركة نفسه بالبيانات الجديدة
@@ -203,12 +211,20 @@ public function store(Request $request)
         try {
             // عكس أثر الحركة على الأرصدة قبل حذفها
             if ($bankTransaction->type === 'deposit') {
-                if($bankTransaction->bank_account_id) BankAccount::find($bankTransaction->bank_account_id)->decrement('balance', $bankTransaction->amount);
+                if ($bankTransaction->bank_account_id && ($account = BankAccount::find($bankTransaction->bank_account_id))) {
+                    $account->applyBalanceDelta(-1 * (float) $bankTransaction->amount);
+                }
             } elseif ($bankTransaction->type === 'withdrawal') {
-                if($bankTransaction->bank_account_id) BankAccount::find($bankTransaction->bank_account_id)->increment('balance', $bankTransaction->amount);
+                if ($bankTransaction->bank_account_id && ($account = BankAccount::find($bankTransaction->bank_account_id))) {
+                    $account->applyBalanceDelta((float) $bankTransaction->amount);
+                }
             } elseif ($bankTransaction->type === 'transfer') {
-                if($bankTransaction->from_account_id) BankAccount::find($bankTransaction->from_account_id)->increment('balance', $bankTransaction->amount);
-                if($bankTransaction->to_account_id) BankAccount::find($bankTransaction->to_account_id)->decrement('balance', $bankTransaction->amount);
+                if ($bankTransaction->from_account_id && ($fromAccount = BankAccount::find($bankTransaction->from_account_id))) {
+                    $fromAccount->applyBalanceDelta((float) $bankTransaction->amount);
+                }
+                if ($bankTransaction->to_account_id && ($toAccount = BankAccount::find($bankTransaction->to_account_id))) {
+                    $toAccount->applyBalanceDelta(-1 * (float) $bankTransaction->amount);
+                }
             }
 
             $bankTransaction->delete();

@@ -12,12 +12,30 @@
             </h3>
         </div>
         <div class="card-toolbar">
+            <a href="{{ route('dashboard.project-transfers.index') }}" class="btn btn-info mr-2">
+                <i class="la la-exchange-alt"></i> تحويل أموال بين المشاريع
+            </a>
             <a href="{{ route('dashboard.projects.create') }}" class="btn btn-primary">
                 <i class="la la-plus"></i> إضافة مشروع جديد
             </a>
         </div>
     </div>
     <div class="card-body">
+        
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="bg-light-primary p-5 rounded">
+                    <h5 class="text-primary"><i class="fas fa-dollar-sign mr-2"></i> إجمالي التكلفة التقديرية (USD)</h5>
+                    <h3 class="font-weight-bold">${{ number_format($total_estimated_cost_usd, 2) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bg-light-success p-5 rounded">
+                    <h5 class="text-success"><i class="fas fa-coins mr-2"></i> إجمالي التكلفة التقديرية (ILS)</h5>
+                    <h3 class="font-weight-bold">{{ number_format($total_estimated_cost_ils, 2) }} ILS</h3>
+                </div>
+            </div>
+        </div>
 
         {{-- رسائل التنبيه --}}
         @if(session('success'))
@@ -36,6 +54,7 @@
                         <th>الموقع</th>
                         <th>تاريخ البدء</th>
                         <th>التكلفة المتوقعة ($)</th>
+                        <th>الرصيد الحالي (ILS)</th>
                         <th>الحالة</th>
                         <th>نسبة الإنجاز</th>
                         <th>الإجراءات</th>
@@ -49,6 +68,9 @@
                         <td>{{ $project->location ?? '-' }}</td>
                         <td>{{ $project->start_date->format('Y-m-d') }}</td>
                         <td>${{ number_format($project->estimated_cost_usd, 2) }}</td>
+                        <td class="font-weight-bold text-{{ $project->balance >= 0 ? 'success' : 'danger' }}">
+                            {{ number_format($project->balance, 2) }} ILS
+                        </td>
                         <td>
                             <span class="badge badge-light-{{ $project->status == 'in_progress' ? 'warning' : ($project->status == 'completed' ? 'success' : 'info') }}">
                                 {{ $project->status }}

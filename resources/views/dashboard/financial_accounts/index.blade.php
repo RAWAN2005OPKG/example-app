@@ -5,19 +5,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
     :root {
-        --terminal-bg: #0f172a;
-        --terminal-card: #1e293b;
+        --terminal-bg: #e2e2e3ff;
+        --terminal-card: #050607ff;
         --terminal-accent: #38bdf8;
         --terminal-success: #10b981;
         --terminal-warning: #fbbf24;
         --terminal-danger: #ef4444;
-        --terminal-text: #f8fafc;
-        --terminal-muted: #94a3b8;
-        --terminal-border: rgba(255, 255, 255, 0.1);
+        --terminal-text: #f7fbffff;
+        --terminal-muted: #546071ff;
+        --terminal-border: rgba(28, 15, 15, 0.1);
     }
 
     body {
-        background: #020617;
+        background: #e0e2e9ff;
         font-family: 'Outfit', sans-serif;
         color: var(--terminal-text);
     }
@@ -48,7 +48,7 @@
         font-weight: 800;
         font-size: 2.5rem;
         letter-spacing: -0.025em;
-        background: linear-gradient(to right, #fff, var(--terminal-muted));
+        background: linear-gradient(to right, #14217aff, var(--terminal-muted));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 0;

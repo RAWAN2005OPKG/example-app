@@ -5,15 +5,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
     :root {
-        --terminal-bg: #020617;
-        --terminal-card: #0f172a;
+        --terminal-bg: #f9faffff;
+        --terminal-card: #03070aff;
         --terminal-accent: #38bdf8;
         --terminal-success: #10b981;
         --terminal-warning: #fbbf24;
         --terminal-danger: #ef4444;
-        --terminal-text: #f8fafc;
-        --terminal-muted: #64748b;
-        --terminal-border: rgba(255, 255, 255, 0.08);
+        --terminal-text: #fbfafcff;
+        --terminal-muted: #dce3eeff;
+        --terminal-border: rgba(100, 33, 121, 0.08);
     }
 
     body {
@@ -49,7 +49,7 @@
         font-size: 2.75rem;
         letter-spacing: -0.05em;
         margin: 0;
-        background: linear-gradient(to right, #fff, #94a3b8);
+        background: linear-gradient(to right, #291575ff, #041731ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
@@ -240,12 +240,12 @@
     <!-- Executive Header -->
     <header class="exec-header">
         <div class="exec-title">
-            <div class="exec-meta">الذكاء المالي المتقدم // معالج البيانات v2.0</div>
-            <h1>التحليل الاستراتيجي</h1>
+            <div class="exec-meta" style="color: var(--terminal-muted);">الذكاء المالي المتقدم // معالج البيانات v2.0</div>
+            <h1  class="exec-meta" style="color: var(--terminal-muted);">التحليل الاستراتيجي</h1>
         </div>
         <div class="text-left">
             <div class="btn-group">
-                <button class="btn btn-outline-light rounded-pill px-4 py-2 font-weight-bold" style="border-color: var(--terminal-border);">
+                <button class="btn btn-outline-light rounded-pill px-4 py-2 font-weight-bold" style="border-color: var(--terminal-muted);">
                     تقرير الربحية <i class="fas fa-file-invoice-dollar mr-2"></i>
                 </button>
             </div>

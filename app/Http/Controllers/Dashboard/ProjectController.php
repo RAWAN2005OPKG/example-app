@@ -17,7 +17,9 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::withCount('units')->latest()->paginate(10);
-        return view('dashboard.projects.index', compact('projects'));
+        $total_estimated_cost_usd = Project::sum('estimated_cost_usd');
+        $total_estimated_cost_ils = Project::sum('estimated_cost_ils');
+        return view('dashboard.projects.index', compact('projects', 'total_estimated_cost_usd', 'total_estimated_cost_ils'));
     }
 
     /**

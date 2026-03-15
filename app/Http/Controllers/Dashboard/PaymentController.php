@@ -124,7 +124,15 @@ class PaymentController extends Controller
     {
         $payment->load('details');
         $bankAccounts = BankAccount::with('bank')->get();
-        return view('dashboard.payments.edit', compact('payment', 'bankAccounts'));
+
+        // جلب العقود الخاصة بهذا الكيان
+        $payableType = $payment->payable_type;
+        $payableId = $payment->payable_id;
+        $contracts = Contract::where('contractable_id', $payableId)
+            ->where('contractable_type', $payableType)
+            ->get();
+
+        return view('dashboard.payments.edit', compact('payment', 'bankAccounts', 'contracts'));
     }
 
     public function update(Request $request, Payment $payment)

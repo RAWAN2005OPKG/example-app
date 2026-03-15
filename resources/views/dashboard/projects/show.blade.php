@@ -90,6 +90,15 @@
                 <div class="details"><div class="label">نسبة الإنجاز</div><div class="value">{{ $project->completion_percentage ?? 0 }}%</div></div>
             </div>
         </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="icon" style="background-color: var(--primary-light); color: var(--primary-color);"><i class="fas fa-wallet"></i></div>
+                <div class="details">
+                    <div class="label">رصيد المشروع الحالي</div>
+                    <div class="value text-{{ $project->balance >= 0 ? 'success' : 'danger' }}">{{ number_format($project->balance, 2) }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- نظام التبويبات --}}

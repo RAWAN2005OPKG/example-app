@@ -61,9 +61,9 @@
                     </select>
                 </div>
                 <div class="col-md-3 form-group">
-                    <label>اسم الكيان <span class="text-danger">*</span></label>
+                    <label>اسم الشخص <span class="text-danger">*</span></label>
                     <select name="payable_id" id="payable_id" class="form-control" required disabled>
-                        <option value="">اختر النوع أولاً</option>
+                        <option value="">اختر الشخص أولاً</option>
                     </select>
                 </div>
                 <div class="col-md-4 form-group">

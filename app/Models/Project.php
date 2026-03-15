@@ -26,6 +26,7 @@ class Project extends Model
         'attachments',
         'completion_percentage',
         'status',
+        'balance',
     ];
 
     protected $casts = [
@@ -52,5 +53,13 @@ class Project extends Model
         return $this->belongsToMany(Investor::class, 'project_investor') // <--- تم إضافة اسم الجدول هنا
             ->withPivot('investment_percentage', 'invested_amount', 'notes')
             ->withTimestamps();
+    }
+
+    /**
+     * تحديث رصيد المشروع
+     */
+    public function applyBalanceDelta(float $amount): void
+    {
+        $this->increment('balance', $amount);
     }
 }

@@ -13,4 +13,6 @@ class WaliVoucher extends Model {
     public function user() { return $this->belongsTo(User::class); }
   public function project() { return $this->belongsTo(Project::class); }
     public function client() { return $this->belongsTo(Client::class); }
-    public function investor() { return $this->belongsTo(Investor::class); }}
+    public function investor() { return $this->belongsTo(Investor::class); }
+    public function contract() { return $this->belongsTo(Contract::class); }
+}

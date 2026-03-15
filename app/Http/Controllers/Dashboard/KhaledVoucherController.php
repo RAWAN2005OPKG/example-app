@@ -67,6 +67,7 @@ class KhaledVoucherController extends Controller
             'project_id' => 'nullable|exists:projects,id',
             'client_id' => 'nullable|exists:clients,id',
             'investor_id' => 'nullable|exists:investors,id',
+            'contract_id' => 'nullable|exists:contracts,id',
             'notes' => 'nullable|string|max:2000',
             'cash_id' => ['required_if:payment_method,cash', 'nullable', 'exists:cash_transactions,id'],
             'from_bank_account_id' => ['required_if:payment_method,bank_transfer', 'nullable', 'exists:bank_accounts,id'],
@@ -94,6 +95,11 @@ class KhaledVoucherController extends Controller
         );
                 $voucher->details()->create($detailsData);
 
+        // ✅ إضافة: تحديث رصيد المشروع
+        if ($voucher->project_id) {
+            $delta = ($voucher->type === 'receipt') ? $voucher->amount_ils : (-1 * $voucher->amount_ils);
+            $voucher->project->applyBalanceDelta((float) $delta);
+        }
 
         DB::commit();
         return redirect()->route('dashboard.khaled.index')->with('success', 'تم إنشاء السند بنجاح.');
@@ -157,15 +163,21 @@ class KhaledVoucherController extends Controller
             'project_id' => 'nullable|exists:projects,id',
             'client_id' => 'nullable|exists:clients,id',
             'investor_id' => 'nullable|exists:investors,id',
+            'contract_id' => 'nullable|exists:contracts,id',
             'notes' => 'nullable|string|max:2000',
             'cash_id' => ['required_if:payment_method,cash', 'nullable', 'exists:cash_transactions,id'],
-            'check_number' => ['required_if:payment_method,check', 'nullable', 'string', 'max:255'],
         ]);
 
         DB::beginTransaction();
         try {
             // حساب المبلغ بالشيكل قبل التحديث
             $validated['amount_ils'] = ($validated['currency'] === 'ILS') ? $validated['amount'] : ($validated['amount'] * $validated['exchange_rate']);
+
+            // ✅ إضافة: عكس أثر المشروع القديم قبل التحديث
+            if ($khaled->project_id) {
+                $oldDelta = ($khaled->type === 'receipt') ? (-1 * $khaled->amount_ils) : $khaled->amount_ils;
+                $khaled->project->applyBalanceDelta((float) $oldDelta);
+            }
 
             $khaled->update($validated);
             
@@ -179,7 +191,12 @@ class KhaledVoucherController extends Controller
                 $khaled->details()->create($details_data);
             }
 
-            // يمكنك إضافة منطق تحديث الأرصدة بالقيم الجديدة هنا
+            // ✅ إضافة: تحديث رصيد المشروع بالقيم الجديدة
+            $khaled = $khaled->fresh();
+            if ($khaled->project_id) {
+                $delta = ($khaled->type === 'receipt') ? $khaled->amount_ils : (-1 * $khaled->amount_ils);
+                $khaled->project->applyBalanceDelta((float) $delta);
+            }
 
             DB::commit();
             return redirect()->route('dashboard.khaled.index')->with('success', 'تم تحديث السند بنجاح.');
@@ -195,7 +212,11 @@ class KhaledVoucherController extends Controller
      */
     public function destroy(KhaledVoucher $khaled)
     {
-        // يمكنك إضافة منطق التراجع عن العملية المالية عند الحذف هنا
+        // ✅ إضافة: عكس الأثر المالي على المشروع عند الحذف
+        if ($khaled->project_id) {
+            $delta = ($khaled->type === 'receipt') ? (-1 * $khaled->amount_ils) : $khaled->amount_ils;
+            $khaled->project->applyBalanceDelta((float) $delta);
+        }
 
         $khaled->delete();
         return redirect()->route('dashboard.khaled.index')->with('success', 'تم نقل السند إلى سلة المحذوفات.');
@@ -217,7 +238,11 @@ class KhaledVoucherController extends Controller
     {
         $voucher = KhaledVoucher::onlyTrashed()->findOrFail($id);
         
-        // يمكنك إضافة منطق إعادة تنفيذ العملية المالية عند الاستعادة هنا
+        // ✅ إضافة: إعادة تطبيق الأثر المالي عند الاستعادة
+        if ($voucher->project_id) {
+            $delta = ($voucher->type === 'receipt') ? $voucher->amount_ils : (-1 * $voucher->amount_ils);
+            $voucher->project->applyBalanceDelta((float) $delta);
+        }
 
         $voucher->restore();
         return redirect()->route('dashboard.khaled.trash')->with('success', 'تم استعادة السند بنجاح.');

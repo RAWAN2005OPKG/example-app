@@ -15,6 +15,8 @@ use App\Models\Payment;
 use App\Models\KhaledVoucher;
 use App\Models\MohammedVoucher;
 use App\Models\WaliVoucher;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class FinancialService
 {
@@ -88,10 +90,51 @@ class FinancialService
 
     public function getTotalExpenses(): float
     {
-        $generalExpenses = (float) Expense::whereNull('payable_type')->sum('amount');
-        $supplierExpenses = (float) SupplierPayment::sum('amount'); // Using amount instead of total_amount
+        // إجمالي المصروفات من جدول المصاريف (يشمل المصاريف العامة ومصاريف الموردين)
+        $allExpenses = (float) Expense::sum('amount_ils');
+        
+        // مصروفات الرواتب (إذا كانت موجودة في مكان آخر مستقبلاً)
+        $salaryExpenses = 0;
 
-        return $generalExpenses + $supplierExpenses;
+        // سندات الصرف (Payments out)
+        $paymentOut = (float) Payment::where('type', 'out')->sum('amount_ils');
+
+        // سندات الصرف من الصناديق الفرعية
+        $khaledOut = (float) KhaledVoucher::where('type', 'payment')->sum('amount_ils');
+        $mohammedOut = (float) MohammedVoucher::where('type', 'payment')->sum('amount_ils');
+        $waliOut = (float) WaliVoucher::where('type', 'payment')->sum('amount_ils');
+
+        return $allExpenses + $salaryExpenses + $paymentOut + $khaledOut + $mohammedOut + $waliOut;
+    }
+
+    /**
+     * يحسب إجمالي الإيرادات.
+     */
+    public function getTotalRevenue(): float
+    {
+        // سندات القبض (Payments in)
+        $paymentIn = (float) Payment::where('type', 'in')->sum('amount_ils');
+
+        // سندات القبض من الصناديق الفرعية
+        $khaledIn = (float) KhaledVoucher::where('type', 'receipt')->sum('amount_ils');
+        $mohammedIn = (float) MohammedVoucher::where('type', 'receipt')->sum('amount_ils');
+        $waliIn = (float) WaliVoucher::where('type', 'receipt')->sum('amount_ils');
+
+        // الدفعات المحصلة من الفواتير (Sale Invoices) - إذا كانت موجودة
+        $salePayments = 0;
+        if (Schema::hasTable('sale_invoice_payments')) {
+            $salePayments = (float) DB::table('sale_invoice_payments')->sum('amount');
+        }
+
+        return $paymentIn + $khaledIn + $mohammedIn + $waliIn + $salePayments;
+    }
+
+    /**
+     * يحسب صافي الربح.
+     */
+    public function getTotalProfit(): float
+    {
+        return $this->getTotalRevenue() - $this->getTotalExpenses();
     }
 
     /**
@@ -135,5 +178,135 @@ class FinancialService
         $balance -= SupplierPayment::sum('amount');
 
         return $balance;
+    }
+
+    /**
+     * يحسب إجمالي الإيرادات لشهر محدد.
+     */
+    public function getMonthlyRevenue(int $year, int $month): float
+    {
+        $paymentIn = (float) Payment::where('type', 'in')
+            ->whereYear('payment_date', $year)
+            ->whereMonth('payment_date', $month)
+            ->sum('amount_ils');
+
+        $khaledIn = (float) KhaledVoucher::where('type', 'receipt')
+            ->whereYear('voucher_date', $year)
+            ->whereMonth('voucher_date', $month)
+            ->sum('amount_ils');
+
+        $mohammedIn = (float) MohammedVoucher::where('type', 'receipt')
+            ->whereYear('voucher_date', $year)
+            ->whereMonth('voucher_date', $month)
+            ->sum('amount_ils');
+
+        $waliIn = (float) WaliVoucher::where('type', 'receipt')
+            ->whereYear('voucher_date', $year)
+            ->whereMonth('voucher_date', $month)
+            ->sum('amount_ils');
+
+        $salePayments = 0;
+        if (Schema::hasTable('sale_invoice_payments')) {
+            $salePayments = (float) DB::table('sale_invoice_payments')
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->sum('amount');
+        }
+
+        return $paymentIn + $khaledIn + $mohammedIn + $waliIn + $salePayments;
+    }
+
+    /**
+     * يحسب إجمالي المصروفات لشهر محدد.
+     */
+    public function getMonthlyExpenses(int $year, int $month): float
+    {
+        $allExpenses = (float) Expense::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->sum('amount_ils');
+
+        $salaryExpenses = 0;
+
+        $paymentOut = (float) Payment::where('type', 'out')
+            ->whereYear('payment_date', $year)
+            ->whereMonth('payment_date', $month)
+            ->sum('amount_ils');
+
+        $khaledOut = (float) KhaledVoucher::where('type', 'payment')
+            ->whereYear('voucher_date', $year)
+            ->whereMonth('voucher_date', $month)
+            ->sum('amount_ils');
+
+        $mohammedOut = (float) MohammedVoucher::where('type', 'payment')
+            ->whereYear('voucher_date', $year)
+            ->whereMonth('voucher_date', $month)
+            ->sum('amount_ils');
+
+        $waliOut = (float) WaliVoucher::where('type', 'payment')
+            ->whereYear('voucher_date', $year)
+            ->whereMonth('voucher_date', $month)
+            ->sum('amount_ils');
+
+        return $allExpenses + $salaryExpenses + $paymentOut + $khaledOut + $mohammedOut + $waliOut;
+    }
+
+    /**
+     * يحسب إجمالي الإيرادات لسنة محددة.
+     */
+    public function getYearlyRevenue(int $year): float
+    {
+        $paymentIn = (float) Payment::where('type', 'in')
+            ->whereYear('payment_date', $year)
+            ->sum('amount_ils');
+
+        $khaledIn = (float) KhaledVoucher::where('type', 'receipt')
+            ->whereYear('voucher_date', $year)
+            ->sum('amount_ils');
+
+        $mohammedIn = (float) MohammedVoucher::where('type', 'receipt')
+            ->whereYear('voucher_date', $year)
+            ->sum('amount_ils');
+
+        $waliIn = (float) WaliVoucher::where('type', 'receipt')
+            ->whereYear('voucher_date', $year)
+            ->sum('amount_ils');
+
+        $salePayments = 0;
+        if (Schema::hasTable('sale_invoice_payments')) {
+            $salePayments = (float) DB::table('sale_invoice_payments')
+                ->whereYear('created_at', $year)
+                ->sum('amount');
+        }
+
+        return $paymentIn + $khaledIn + $mohammedIn + $waliIn + $salePayments;
+    }
+
+    /**
+     * يحسب إجمالي المصروفات لسنة محددة.
+     */
+    public function getYearlyExpenses(int $year): float
+    {
+        $allExpenses = (float) Expense::whereYear('date', $year)
+            ->sum('amount_ils');
+
+        $salaryExpenses = 0; // كما تم الاتفاق عليه حالياً لعدم وجود الجدول
+
+        $paymentOut = (float) Payment::where('type', 'out')
+            ->whereYear('payment_date', $year)
+            ->sum('amount_ils');
+
+        $khaledOut = (float) KhaledVoucher::where('type', 'payment')
+            ->whereYear('voucher_date', $year)
+            ->sum('amount_ils');
+
+        $mohammedOut = (float) MohammedVoucher::where('type', 'payment')
+            ->whereYear('voucher_date', $year)
+            ->sum('amount_ils');
+
+        $waliOut = (float) WaliVoucher::where('type', 'payment')
+            ->whereYear('voucher_date', $year)
+            ->sum('amount_ils');
+
+        return $allExpenses + $salaryExpenses + $paymentOut + $khaledOut + $mohammedOut + $waliOut;
     }
 }

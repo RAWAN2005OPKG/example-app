@@ -29,8 +29,8 @@ class FundTransferController extends Controller
 
         // إضافة أسماء الحسابات بشكل واضح للعرض في الجدول
         $transfers->getCollection()->transform(function ($transfer) {
-            $transfer->fromAccountName = $this->getAccountName($transfer->from_type, $transfer->from_id);
-            $transfer->toAccountName = $this->getAccountName($transfer->to_type, $transfer->to_id);
+            $transfer->fromAccountName = $this->getAccountName($transfer->fromable_type, $transfer->fromable_id);
+            $transfer->toAccountName = $this->getAccountName($transfer->toable_type, $transfer->toable_id);
             return $transfer;
         });
 
@@ -43,13 +43,13 @@ class FundTransferController extends Controller
         $cashSafes = CashSafe::where('is_active', true)->get();
 
         // Get Khaled vouchers (active only)
-        $khaledVouchers = KhaledVoucher::where('status', 'approved')->get();
+        $khaledVouchers = KhaledVoucher::all();
 
         // Get Mohammed vouchers (active only)
-        $mohammedVouchers = MohammedVoucher::where('status', 'approved')->get();
+        $mohammedVouchers = MohammedVoucher::all();
 
         // Get Waleed/Wali vouchers (active only)
-        $waliVouchers = WaliVoucher::where('status', 'approved')->get();
+        $waliVouchers = WaliVoucher::all();
 
         return view('dashboard.fund_transfers.create', compact(
             'bankAccounts',
@@ -96,10 +96,10 @@ class FundTransferController extends Controller
                 'date' => $request->date,
                 'amount' => $amount,
                 'currency' => $request->currency,
-                'from_type' => $fromType,
-                'from_id' => $fromId,
-                'to_type' => $toType,
-                'to_id' => $toId,
+                'fromable_type' => $fromType,
+                'fromable_id' => $fromId,
+                'toable_type' => $toType,
+                'toable_id' => $toId,
                 'notes' => $request->notes,
             ]);
 
@@ -123,8 +123,8 @@ class FundTransferController extends Controller
         $mohammedVouchers = MohammedVoucher::where('status', 'approved')->get();
         $waliVouchers = WaliVoucher::where('status', 'approved')->get();
 
-        $fromAccountName = $this->getAccountName($fundTransfer->from_type, $fundTransfer->from_id);
-        $toAccountName = $this->getAccountName($fundTransfer->to_type, $fundTransfer->to_id);
+        $fromAccountName = $this->getAccountName($fundTransfer->fromable_type, $fundTransfer->fromable_id);
+        $toAccountName = $this->getAccountName($fundTransfer->toable_type, $fundTransfer->toable_id);
 
         return view('dashboard.fund_transfers.edit', compact(
             'fundTransfer',
@@ -159,17 +159,17 @@ class FundTransferController extends Controller
         DB::beginTransaction();
         try {
             // Restore balance to old from account
-            $this->updateAccountBalance($fundTransfer->from_type, $fundTransfer->from_id, $fundTransfer->amount);
+            $this->updateAccountBalance($fundTransfer->fromable_type, $fundTransfer->fromable_id, $fundTransfer->amount);
 
             // Deduct from old to account
-            $this->updateAccountBalance($fundTransfer->to_type, $fundTransfer->to_id, -1 * $fundTransfer->amount);
+            $this->updateAccountBalance($fundTransfer->toable_type, $fundTransfer->toable_id, -1 * $fundTransfer->amount);
 
             // Validate new from account has sufficient balance
             $fromBalance = $this->getAccountBalance($newFromType, $newFromId);
             if ($fromBalance < $newAmount) {
                 // Restore old balances
-                $this->updateAccountBalance($fundTransfer->from_type, $fundTransfer->from_id, -1 * $fundTransfer->amount);
-                $this->updateAccountBalance($fundTransfer->to_type, $fundTransfer->to_id, $fundTransfer->amount);
+                $this->updateAccountBalance($fundTransfer->fromable_type, $fundTransfer->fromable_id, -1 * $fundTransfer->amount);
+                $this->updateAccountBalance($fundTransfer->toable_type, $fundTransfer->toable_id, $fundTransfer->amount);
 
                 return back()->withErrors(['error' => 'الرصيد في الحساب المصدر الجديد غير كافٍ لإتمام عملية التحويل.'])->withInput();
             }
@@ -183,10 +183,10 @@ class FundTransferController extends Controller
                 'date' => $request->date,
                 'amount' => $newAmount,
                 'currency' => $request->currency,
-                'from_type' => $newFromType,
-                'from_id' => $newFromId,
-                'to_type' => $newToType,
-                'to_id' => $newToId,
+                'fromable_type' => $newFromType,
+                'fromable_id' => $newFromId,
+                'toable_type' => $newToType,
+                'toable_id' => $newToId,
                 'notes' => $request->notes,
             ]);
 
@@ -208,10 +208,10 @@ class FundTransferController extends Controller
         DB::beginTransaction();
         try {
             // Reverse the transfer - restore balance to from account
-            $this->updateAccountBalance($fundTransfer->from_type, $fundTransfer->from_id, $fundTransfer->amount);
+            $this->updateAccountBalance($fundTransfer->fromable_type, $fundTransfer->fromable_id, $fundTransfer->amount);
 
             // Deduct from to account
-            $this->updateAccountBalance($fundTransfer->to_type, $fundTransfer->to_id, -1 * $fundTransfer->amount);
+            $this->updateAccountBalance($fundTransfer->toable_type, $fundTransfer->toable_id, -1 * $fundTransfer->amount);
 
             // Delete journal entry
             $this->deleteJournalEntry($fundTransfer);
@@ -233,16 +233,16 @@ class FundTransferController extends Controller
     private function createJournalEntry(FundTransfer $transfer, Request $request)
     {
         // Get or create accounts for the transfer
-        $fromAccount = $this->getOrCreateTransferAccount($transfer->from_type, $transfer->from_id, 'من');
-        $toAccount = $this->getOrCreateTransferAccount($transfer->to_type, $transfer->to_id, 'إلى');
+        $fromAccount = $this->getOrCreateTransferAccount($transfer->fromable_type, $transfer->fromable_id, 'من');
+        $toAccount = $this->getOrCreateTransferAccount($transfer->toable_type, $transfer->toable_id, 'إلى');
 
         if (!$fromAccount || !$toAccount) {
             // If accounts don't exist, skip journal entry
             return;
         }
 
-        $description = 'تحويل من ' . $this->getAccountName($transfer->from_type, $transfer->from_id) .
-                       ' إلى ' . $this->getAccountName($transfer->to_type, $transfer->to_id);
+        $description = 'تحويل من ' . $this->getAccountName($transfer->fromable_type, $transfer->fromable_id) .
+                       ' إلى ' . $this->getAccountName($transfer->toable_type, $transfer->toable_id);
 
         if ($transfer->notes) {
             $description .= ' - ' . $transfer->notes;
@@ -493,7 +493,9 @@ class FundTransferController extends Controller
             case 'khaled':
             case 'mohammed':
             case 'wali':
+                // تحديث كل من المبلغ الأساسي والمبلغ بالشيكل لضمان التزامن
                 $account->increment('amount', $amount);
+                $account->increment('amount_ils', $amount); // نفترض أن التحويل بالشيكل
                 break;
         }
     }

@@ -61,6 +61,7 @@ class MohammedVoucherController extends Controller
             'project_id' => 'nullable|exists:projects,id',
             'client_id' => 'nullable|exists:clients,id',
             'investor_id' => 'nullable|exists:investors,id',
+            'contract_id' => 'nullable|exists:contracts,id',
             'notes' => 'nullable|string|max:2000',
             'cash_source_name' => ['required_if:payment_method,cash', 'nullable', 'string', 'max:255'],
             'from_bank_account_id' => ['required_if:payment_method,bank_transfer', 'nullable', 'exists:bank_accounts,id'],
@@ -79,6 +80,12 @@ class MohammedVoucherController extends Controller
 
             $voucher = MohammedVoucher::create($voucherData + ['user_id' => Auth::id()]);
             $voucher->details()->create($detailsData);
+
+            // ✅ إضافة: تحديث رصيد المشروع
+            if ($voucher->project_id) {
+                $delta = ($voucher->type === 'receipt') ? $voucher->amount_ils : (-1 * $voucher->amount_ils);
+                $voucher->project->applyBalanceDelta((float) $delta);
+            }
 
             DB::commit();
             return redirect()->route('dashboard.mohammed.index')->with('success', 'تم إنشاء سند محمد بنجاح.');
@@ -132,6 +139,7 @@ class MohammedVoucherController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'currency' => 'required|string|size:3',
             'exchange_rate' => 'required|numeric|min:0',
+            'contract_id' => 'nullable|exists:contracts,id',
             'cash_source_name' => ['required_if:payment_method,cash', 'nullable', 'string', 'max:255'],
         ]);
 
@@ -141,6 +149,12 @@ class MohammedVoucherController extends Controller
             $voucherData = array_diff_key($validated, array_flip(array_keys($detailsData)));
             $voucherData['amount_ils'] = ($voucherData['currency'] === 'ILS') ? $voucherData['amount'] : ($voucherData['amount'] * $voucherData['exchange_rate']);
 
+            // ✅ إضافة: عكس أثر المشروع القديم قبل التحديث
+            if ($mohammed->project_id) {
+                $oldDelta = ($mohammed->type === 'receipt') ? (-1 * $mohammed->amount_ils) : $mohammed->amount_ils;
+                $mohammed->project->applyBalanceDelta((float) $oldDelta);
+            }
+
             $mohammed->update($voucherData);
 
             if ($mohammed->details) {
@@ -148,6 +162,13 @@ class MohammedVoucherController extends Controller
                 $mohammed->details->update(array_filter($detailsData));
             } else {
                 $mohammed->details()->create($detailsData);
+            }
+
+            // ✅ إضافة: تحديث رصيد المشروع بالقيم الجديدة
+            $mohammed = $mohammed->fresh();
+            if ($mohammed->project_id) {
+                $delta = ($mohammed->type === 'receipt') ? $mohammed->amount_ils : (-1 * $mohammed->amount_ils);
+                $mohammed->project->applyBalanceDelta((float) $delta);
             }
 
             DB::commit();
@@ -163,6 +184,12 @@ class MohammedVoucherController extends Controller
      */
     public function destroy(MohammedVoucher $mohammed)
     {
+        // ✅ إضافة: عكس الأثر المالي على المشروع عند الحذف
+        if ($mohammed->project_id) {
+            $delta = ($mohammed->type === 'receipt') ? (-1 * $mohammed->amount_ils) : $mohammed->amount_ils;
+            $mohammed->project->applyBalanceDelta((float) $delta);
+        }
+
         $mohammed->delete();
         return redirect()->route('dashboard.mohammed.index')->with('success', 'تم نقل السند إلى سلة المحذوفات.');
     }
@@ -181,7 +208,15 @@ class MohammedVoucherController extends Controller
      */
     public function restore($id)
     {
-        MohammedVoucher::onlyTrashed()->findOrFail($id)->restore();
+        $voucher = MohammedVoucher::onlyTrashed()->findOrFail($id);
+        
+        // ✅ إضافة: إعادة تطبيق الأثر المالي عند الاستعادة
+        if ($voucher->project_id) {
+            $delta = ($voucher->type === 'receipt') ? $voucher->amount_ils : (-1 * $voucher->amount_ils);
+            $voucher->project->applyBalanceDelta((float) $delta);
+        }
+
+        $voucher->restore();
         return redirect()->route('dashboard.mohammed.trash')->with('success', 'تم استعادة السند بنجاح.');
     }
 

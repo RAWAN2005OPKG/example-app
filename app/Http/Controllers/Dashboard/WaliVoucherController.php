@@ -43,6 +43,10 @@ class WaliVoucherController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'currency' => 'required|string|size:3',
             'exchange_rate' => 'required|numeric|min:0',
+            'project_id' => 'nullable|exists:projects,id',
+            'client_id' => 'nullable|exists:clients,id',
+            'investor_id' => 'nullable|exists:investors,id',
+            'contract_id' => 'nullable|exists:contracts,id',
             'cash_source_name' => ['required_if:payment_method,cash', 'nullable', 'string', 'max:255'],
         ]);
 
@@ -54,6 +58,12 @@ class WaliVoucherController extends Controller
             
             $voucher = WaliVoucher::create($voucherData + ['user_id' => Auth::id()]);
             $voucher->details()->create($detailsData);
+
+            // ✅ إضافة: تحديث رصيد المشروع
+            if ($voucher->project_id) {
+                $delta = ($voucher->type === 'receipt') ? $voucher->amount_ils : (-1 * $voucher->amount_ils);
+                $voucher->project->applyBalanceDelta((float) $delta);
+            }
 
             DB::commit();
             return redirect()->route('dashboard.wali.index')->with('success', 'تم إنشاء سند وليد بنجاح.');
@@ -93,6 +103,10 @@ class WaliVoucherController extends Controller
             'payment_method' => 'required|in:cash,bank_transfer,check',
             'description' => 'required|string|max:1000',
             'amount' => 'required|numeric|min:0.01',
+            'project_id' => 'nullable|exists:projects,id',
+            'client_id' => 'nullable|exists:clients,id',
+            'investor_id' => 'nullable|exists:investors,id',
+            'contract_id' => 'nullable|exists:contracts,id',
             'cash_source_name' => ['required_if:payment_method,cash', 'nullable', 'string', 'max:255'],
         ]);
 
@@ -106,6 +120,12 @@ class WaliVoucherController extends Controller
             $exchangeRate = $request->exchange_rate ?? $wali->exchange_rate;
             $voucherData['amount_ils'] = ($currency === 'ILS') ? $amount : ($amount * $exchangeRate);
 
+            // ✅ إضافة: عكس أثر المشروع القديم قبل التحديث
+            if ($wali->project_id) {
+                $oldDelta = ($wali->type === 'receipt') ? (-1 * $wali->amount_ils) : $wali->amount_ils;
+                $wali->project->applyBalanceDelta((float) $oldDelta);
+            }
+
             $wali->update($voucherData);
             
             if ($wali->details) {
@@ -113,6 +133,13 @@ class WaliVoucherController extends Controller
                 $wali->details->update(array_filter($detailsData));
             } else {
                 $wali->details()->create($detailsData);
+            }
+
+            // ✅ إضافة: تحديث رصيد المشروع بالقيم الجديدة
+            $wali = $wali->fresh();
+            if ($wali->project_id) {
+                $delta = ($wali->type === 'receipt') ? $wali->amount_ils : (-1 * $wali->amount_ils);
+                $wali->project->applyBalanceDelta((float) $delta);
             }
 
             DB::commit();
@@ -124,6 +151,12 @@ class WaliVoucherController extends Controller
     }
 
     public function destroy(WaliVoucher $wali) {
+        // ✅ إضافة: عكس الأثر المالي على المشروع عند الحذف
+        if ($wali->project_id) {
+            $delta = ($wali->type === 'receipt') ? (-1 * $wali->amount_ils) : $wali->amount_ils;
+            $wali->project->applyBalanceDelta((float) $delta);
+        }
+
         $wali->delete();
         return redirect()->route('dashboard.wali.index')->with('success', 'تم نقل السند إلى سلة المحذوفات.');
     }
@@ -134,7 +167,15 @@ class WaliVoucherController extends Controller
     }
 
     public function restore($id) {
-        WaliVoucher::onlyTrashed()->findOrFail($id)->restore();
+        $voucher = WaliVoucher::onlyTrashed()->findOrFail($id);
+        
+        // ✅ إضافة: إعادة تطبيق الأثر المالي عند الاستعادة
+        if ($voucher->project_id) {
+            $delta = ($voucher->type === 'receipt') ? $voucher->amount_ils : (-1 * $voucher->amount_ils);
+            $voucher->project->applyBalanceDelta((float) $delta);
+        }
+
+        $voucher->restore();
         return redirect()->route('dashboard.wali.trash')->with('success', 'تم استعادة السند بنجاح.');
     }
 

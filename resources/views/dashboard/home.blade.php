@@ -89,16 +89,28 @@
     <!-- == القسم الأول: المبلغ الرئيسي (كما طلبت تماماً) == -->
     <!-- ================================================== -->
     <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="main-capital-card">
-                <h1>الرقم الأساسي من الإعدادات</h1>
-                <div class="display-4">{{ number_format($openingBalance, 2) }} ILS</div>
+        <div class="col-lg-3 mb-4">
+            <div class="main-capital-card" style="background: linear-gradient(45deg, #4e73df 0%, #224abe 100%);">
+                <h1>الإيرادات الإجمالية</h1>
+                <div class="display-4" style="font-size: 2.5rem;">{{ number_format($totalRevenue, 2) }} ILS</div>
             </div>
         </div>
-        <div class="col-lg-6 mb-4">
+        <div class="col-lg-3 mb-4">
+            <div class="main-capital-card" style="background: linear-gradient(45deg, #1cc88a 0%, #13855c 100%);">
+                <h1>صافي الربح</h1>
+                <div class="display-4" style="font-size: 2.5rem;">{{ number_format($totalProfit, 2) }} ILS</div>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-4">
             <div class="main-capital-card">
-                <h1>الإجمالي بعد الإضافات الحالية</h1>
-                <div class="display-4">{{ number_format($totalCapital, 2) }} ILS</div>
+                <h1>الرقم الأساسي</h1>
+                <div class="display-4" style="font-size: 2.5rem;">{{ number_format($openingBalance, 2) }} ILS</div>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-4">
+            <div class="main-capital-card">
+                <h1>الإجمالي الحالي</h1>
+                <div class="display-4" style="font-size: 2.5rem;">{{ number_format($totalCapital, 2) }} ILS</div>
             </div>
         </div>
     </div>

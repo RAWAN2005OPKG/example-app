@@ -18,9 +18,9 @@ class FinancialController extends Controller
         $totalCapital = $financialService->getTotalCapital();
 
         // 1. بطاقات الإحصائيات الرئيسية
-        $totalRevenue = SaleInvoice::sum('total_amount') ?: 0;
+        $totalRevenue = $financialService->getTotalRevenue();
         $totalExpenses = $financialService->getTotalExpenses();
-        $netProfit = $totalRevenue - $totalExpenses;
+        $netProfit = $financialService->getTotalProfit();
         
         // صافي التدفق النقدي (إجمالي المقبوضات - إجمالي المدفوعات من كل الخزائن والبنوك)
         $totalIn = \App\Models\CashTransaction::where('type', 'in')->sum('amount_ils') + 
@@ -43,13 +43,8 @@ class FinancialController extends Controller
             $date = Carbon::now()->subMonths($i);
             $chartLabels[] = $date->translatedFormat('F'); // Use translated format for Arabic months
 
-            $chartData['revenue'][] = SaleInvoice::whereYear('issue_date', $date->year)
-                                                ->whereMonth('issue_date', $date->month)
-                                                ->sum('total_amount') ?? 0;
-
-            $chartData['expense'][] = Expense::whereYear('date', $date->year)
-                                              ->whereMonth('date', $date->month)
-                                              ->sum('amount') ?? 0;
+            $chartData['revenue'][] = $financialService->getMonthlyRevenue($date->year, $date->month);
+            $chartData['expense'][] = $financialService->getMonthlyExpenses($date->year, $date->month);
         }
 
         // 3. أحدث المعاملات (من قيود اليومية)

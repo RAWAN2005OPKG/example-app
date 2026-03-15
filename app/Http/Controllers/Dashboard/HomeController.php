@@ -47,17 +47,23 @@ class HomeController extends Controller
         // 4. بيانات الرسم البياني للإيرادات والمصروفات الشهرية (آخر 6 أشهر)
         $monthlyFlow = $this->getMonthlyFinancialFlow();
 
-        // 5. جلب آخر 5 حركات (كمثال)
+        // 5. جلب الإحصائيات الجديدة للربحية
+        $totalRevenue = $this->financialService->getTotalRevenue();
+        $totalProfit = $this->financialService->getTotalProfit();
+
+        // 6. جلب آخر 5 حركات (كمثال)
         $latestCash = CashTransaction::latest()->take(5)->get();
         $latestBank = BankTransaction::latest()->take(5)->get();
 
-        // 6. إرسال كل البيانات إلى الواجهة
+        // 7. إرسال كل البيانات إلى الواجهة
         return view('dashboard.home', [
             'openingBalance' => $openingBalance,
             'totalCapital' => $totalCapital,
             'totalCashBalance' => $totalCashBalance,
             'totalBankBalance' => $totalBankBalance,
             'checksBalance' => $checksBalance,
+            'totalRevenue' => $totalRevenue,
+            'totalProfit' => $totalProfit,
             'projectsCount' => $projectsCount,
             'activeProjectsCount' => $activeProjectsCount,
             'liquidityData' => json_encode($liquidityData),

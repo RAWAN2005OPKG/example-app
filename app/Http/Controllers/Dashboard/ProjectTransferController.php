@@ -43,13 +43,18 @@ class ProjectTransferController extends Controller
 
         DB::beginTransaction();
         try {
+            $fromProject = Project::findOrFail($validated['from_project_id']);
+            $toProject = Project::findOrFail($validated['to_project_id']);
+
+            // تحقق من توفر الرصيد الكافي
+            if ($fromProject->balance < $validated['amount']) {
+                return back()->with('error', 'الرصيد في المشروع المصدر غير كافٍ. الرصيد الحالي: ' . number_format($fromProject->balance, 2))->withInput();
+            }
+
             // إنشاء سجل التحويل
             ProjectTransfer::create($validated + ['user_id' => Auth::id()]);
 
             // تحديث أرصدة المشاريع
-            $fromProject = Project::find($validated['from_project_id']);
-            $toProject = Project::find($validated['to_project_id']);
-
             $fromProject->decrement('balance', $validated['amount']);
             $toProject->increment('balance', $validated['amount']);
 

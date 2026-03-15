@@ -23,12 +23,24 @@
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
-            <h4 class="mb-5 text-primary">1. الكيان المرتبط</h4>
+            <h4 class="mb-5 text-primary">1. الشخص المرتبط</h4>
             <div class="alert alert-info">
-                <strong>الكيان:</strong> {{ $payment->payable->name ?? 'N/A' }} ({{ str_replace('App\\Models\\', '', $payment->payable_type) }})
+                <strong>الشخص:</strong> {{ $payment->payable->name ?? 'N/A' }} ({{ str_replace('App\\Models\\', '', $payment->payable_type) }})
             </div>
             <input type="hidden" name="payable_id" value="{{ $payment->payable_id }}">
             <input type="hidden" name="payable_type" value="{{ str_replace('App\\Models\\', '', $payment->payable_type) }}">
+
+            <div class="form-group">
+                <label>العقد المرتبط</label>
+                <select name="contract_id" class="form-control select2-basic">
+                    <option value="">-- اختر العقد (اختياري) --</option>
+                    @foreach($contracts as $contract)
+                        <option value="{{ $contract->id }}" @selected(old('contract_id', $payment->contract_id) == $contract->id)>
+                            العقد رقم: {{ $contract->id }} - القيمة: {{ number_format($contract->investment_amount, 2) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
             {{-- ================== 2. تفاصيل الدفعة ================== --}}
             <h4 class="my-5 text-primary">2. تفاصيل الدفعة</h4>

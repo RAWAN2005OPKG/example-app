@@ -75,9 +75,9 @@ class ExpenseController extends Controller
                 $bankAccount->applyBalanceDelta(-1 * (float) $expense->amount);
             }
 
-            $admins = User::where('role', 'admin')->get();
-            if ($admins->isNotEmpty()) {
-                Notification::send($admins, new NewExpenseNotification($expense));
+            // تحديث رصيد المشروع (خصم المصروف)
+            if ($expense->project_id) {
+                $expense->project->applyBalanceDelta(-1 * (float) $expense->amount_ils);
             }
 
             DB::commit();
@@ -162,6 +162,11 @@ class ExpenseController extends Controller
             ]);
             $bankAccount->applyBalanceDelta(-1 * (float) $expense->amount);
         }
+
+        // تحديث رصيد المشروع
+        if ($expense->project_id) {
+            $expense->project->applyBalanceDelta(-1 * (float) $expense->amount_ils);
+        }
     }
 
     protected function revertFinancialImpact(Expense $expense)
@@ -179,6 +184,11 @@ class ExpenseController extends Controller
                 }
                 $transaction->delete();
             }
+        }
+
+        // عكس أثر رصيد المشروع (إعادة المبلغ)
+        if ($expense->project_id) {
+            $expense->project->applyBalanceDelta((float) $expense->amount_ils);
         }
     }
     public function trash() { $trashed = Expense::onlyTrashed()->latest()->paginate(15); return view('dashboard.expenses.trash', ['expenses' => $trashed]); }

@@ -1,4 +1,4 @@
-لا<?php
+<?php
 
 namespace App\Models;
 
@@ -10,6 +10,10 @@ class JournalEntry extends Model
     use HasFactory;
 
     protected $fillable = ['date', 'description', 'reference_type', 'reference_id'];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
 
     public function items()
     {

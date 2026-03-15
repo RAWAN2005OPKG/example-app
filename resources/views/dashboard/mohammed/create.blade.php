@@ -40,9 +40,10 @@
 
             <div class="card shadow-sm mb-5"><div class="card-header"><h4 class="card-title">4. ربط وتحويل (اختياري)</h4></div><div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 form-group"><label>ربط بمشروع</label><select name="project_id" class="form-control select2-basic"><option value="">-- اختر مشروع --</option>@foreach($projects as $project)<option value="{{ $project->id }}" @selected(old('project_id') == $project->id)>{{ $project->name }}</option>@endforeach</select></div>
-                    <div class="col-md-4 form-group"><label>ربط بعميل</label><select name="client_id" class="form-control select2-basic"><option value="">-- اختر عميل --</option>@foreach($clients as $client)<option value="{{ $client->id }}" @selected(old('client_id') == $client->id)>{{ $client->name }}</option>@endforeach</select></div>
-                    <div class="col-md-4 form-group"><label>ربط بمستثمر</label><select name="investor_id" class="form-control select2-basic"><option value="">-- اختر مستثمر --</option>@foreach($investors as $investor)<option value="{{ $investor->id }}" @selected(old('investor_id') == $investor->id)>{{ $investor->name }}</option>@endforeach</select></div>
+                    <div class="col-md-3 form-group"><label>ربط بمشروع</label><select name="project_id" id="project_id" class="form-control select2-basic"><option value="">-- اختر مشروع --</option>@foreach($projects as $project)<option value="{{ $project->id }}" @selected(old('project_id') == $project->id)>{{ $project->name }}</option>@endforeach</select></div>
+                    <div class="col-md-3 form-group"><label>ربط بعميل</label><select name="client_id" id="client_id" class="form-control select2-basic payable-trigger"><option value="">-- اختر عميل --</option>@foreach($clients as $client)<option value="{{ $client->id }}" @selected(old('client_id') == $client->id)>{{ $client->name }}</option>@endforeach</select></div>
+                    <div class="col-md-3 form-group"><label>ربط بمستثمر</label><select name="investor_id" id="investor_id" class="form-control select2-basic payable-trigger"><option value="">-- اختر مستثمر --</option>@foreach($investors as $investor)<option value="{{ $investor->id }}" @selected(old('investor_id') == $investor->id)>{{ $investor->name }}</option>@endforeach</select></div>
+                    <div class="col-md-3 form-group"><label>العقد المرتبط</label><select name="contract_id" id="contract_id" class="form-control select2-basic"><option value="">-- اختر العقد --</option></select></div>
                 </div>
                 <div class="form-group"><label>ملاحظات</label><textarea name="notes" class="form-control" rows="2">{{ old('notes') }}</textarea></div>
             </div></div>
@@ -118,6 +119,27 @@ $(document ).ready(function() {
 
     renderPaymentDetails();
     updateExchangeRate();
+
+    $('.payable-trigger').on('change', function() {
+        const id = $(this).val();
+        const type = $(this).attr('id') === 'client_id' ? 'Client' : 'Investor';
+        const contractSelect = $('#contract_id');
+        contractSelect.empty().append('<option value="">جاري التحميل...</option>');
+        if (id) {
+            $.ajax({
+                url: "{{ route('dashboard.getPayableContracts') }}",
+                data: { payable_id: id, payable_type: type },
+                success: function(data) {
+                    contractSelect.empty().append('<option value="">-- اختر العقد --</option>');
+                    data.contracts.forEach(c => {
+                        contractSelect.append(`<option value="${c.id}">العقد رقم ${c.id} - ${c.investment_amount}</option>`);
+                    });
+                }
+            });
+        } else {
+            contractSelect.empty().append('<option value="">-- اختر العقد --</option>');
+        }
+    });
 });
 </script>
 @endpush

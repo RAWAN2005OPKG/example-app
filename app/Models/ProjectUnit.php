@@ -14,16 +14,18 @@ class ProjectUnit extends Model
         'project_id',
         'unit_number',
         'unit_type',
-        'floor_number',
-        'area_sqm',
-        'expected_price_usd',
-        'specifications',
+        'floor',
+        'area',
+        'price_usd',
+        'price_ils',
+        'notes',
         'status',
     ];
 
     protected $casts = [
-        'area_sqm' => 'float',
-        'expected_price_usd' => 'float',
+        'area' => 'float',
+        'price_usd' => 'float',
+        'price_ils' => 'float',
     ];
 
     /**

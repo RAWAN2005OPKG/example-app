@@ -78,12 +78,13 @@ class ProjectController extends Controller
 
                 // 4. إضافة الوحدات (إن وجدت)
                 if (!empty($validatedData['units'])) {
-                    $exchangeRate = $validatedData['exchange_rate'];
+                    $exchangeRate = $validatedData['exchange_rate'] ?: 3.75;
                     foreach ($validatedData['units'] as $unitData) {
                         $priceUSD = $unitData['price_usd'] ?? 0;
                         $priceILS = $priceUSD * $exchangeRate;
                         $project->units()->create(array_merge($unitData, [
-                            'price_ils' => $priceILS
+                            'price_ils' => $priceILS,
+                            'price_usd' => $priceUSD,
                         ]));
                     }
                 }
@@ -175,11 +176,14 @@ class ProjectController extends Controller
                 // 3. تحديث الوحدات (حذف القديم وإضافة الجديد لضمان التزامن)
                 $project->units()->delete();
                 if (!empty($validatedData['units'])) {
-                    $exchangeRate = $validatedData['exchange_rate'];
+                    $exchangeRate = $validatedData['exchange_rate'] ?: 3.75;
                     foreach ($validatedData['units'] as $unitData) {
                         $priceUSD = $unitData['price_usd'] ?? 0;
                         $priceILS = $priceUSD * $exchangeRate;
-                        $project->units()->create(array_merge($unitData, ['price_ils' => $priceILS]));
+                        $project->units()->create(array_merge($unitData, [
+                            'price_ils' => $priceILS,
+                            'price_usd' => $priceUSD,
+                        ]));
                     }
                 }
             });

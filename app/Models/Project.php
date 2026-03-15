@@ -22,6 +22,8 @@ class Project extends Model
         'main_contractor',
         'architect',
         'estimated_cost_usd',
+        'estimated_cost_ils',
+        'exchange_rate',
         'notes',
         'attachments',
         'completion_percentage',
@@ -34,6 +36,9 @@ class Project extends Model
         'estimated_end_date' => 'date',
         'attachments' => 'array',
         'estimated_cost_usd' => 'float',
+        'estimated_cost_ils' => 'float',
+        'exchange_rate' => 'float',
+        'balance' => 'float',
         'completion_percentage' => 'integer',
     ];
 
@@ -61,5 +66,47 @@ class Project extends Model
     public function applyBalanceDelta(float $amount): void
     {
         $this->increment('balance', $amount);
+    }
+
+    /**
+     * إجمالي قيمة العقود المرتبطة بالمشروع
+     */
+    public function getTotalContractValueAttribute(): float
+    {
+        return (float) Contract::where('project_id', $this->id)->sum('total_amount_ils');
+    }
+
+    /**
+     * إجمالي الاستثمارات المرتبطة بالمشروع
+     */
+    public function getTotalInvestmentsAttribute(): float
+    {
+        return (float) $this->investors()->sum('invested_amount_ils');
+    }
+
+    /**
+     * إجمالي المحصل من العملاء (عبر العقود المرتبطة بوحدات المشروع)
+     */
+    public function getTotalCollectedFromClientsAttribute(): float
+    {
+        return (float) Payment::where('type', 'in')
+            ->whereHas('contract', function($q) {
+                $q->where('project_id', $this->id)
+                  ->where('contractable_type', Client::class);
+            })
+            ->sum(DB::raw('amount * exchange_rate'));
+    }
+
+    /**
+     * إجمالي المحصل من المستثمرين
+     */
+    public function getTotalCollectedFromInvestorsAttribute(): float
+    {
+        return (float) Payment::where('type', 'in')
+            ->where('payable_type', Investor::class)
+            ->whereHas('contract', function($q) {
+                $q->where('project_id', $this->id);
+            })
+            ->sum(DB::raw('amount * exchange_rate'));
     }
 }

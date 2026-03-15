@@ -1,11 +1,9 @@
 <?php
 
 use App\Models\Project;
+use App\Models\Voucher;
+use App\Models\Payment;
 use App\Models\ProjectTransfer;
-use App\Models\Expense;
-use App\Models\KhaledVoucher;
-use App\Models\MohammedVoucher;
-use App\Models\WaliVoucher;
 use Illuminate\Support\Facades\DB;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -13,45 +11,39 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-DB::beginTransaction();
-try {
+echo "Starting project balance synchronization...\n";
+
+DB::transaction(function() {
     $projects = Project::all();
 
-    echo "Starting Project Balance Reconciliation...\n";
-    echo str_repeat("-", 40) . "\n";
-
     foreach ($projects as $project) {
-        $transfersIn = ProjectTransfer::where('to_project_id', $project->id)->sum('amount');
-        $transfersOut = ProjectTransfer::where('from_project_id', $project->id)->sum('amount');
-        $expenses = Expense::where('project_id', $project->id)->sum('amount_ils');
-        
-        $khaledIn = KhaledVoucher::where('project_id', $project->id)->where('type', 'receipt')->sum('amount_ils');
-        $khaledOut = KhaledVoucher::where('project_id', $project->id)->where('type', 'payment')->sum('amount_ils');
-        
-        $mohammedIn = MohammedVoucher::where('project_id', $project->id)->where('type', 'receipt')->sum('amount_ils');
-        $mohammedOut = MohammedVoucher::where('project_id', $project->id)->where('type', 'payment')->sum('amount_ils');
-        
-        $waliIn = WaliVoucher::where('project_id', $project->id)->where('type', 'receipt')->sum('amount_ils');
-        $waliOut = WaliVoucher::where('project_id', $project->id)->where('type', 'payment')->sum('amount_ils');
+        $balance = 0;
 
-        $totalIn = $transfersIn + $khaledIn + $mohammedIn + $waliIn;
-        $totalOut = $transfersOut + $expenses + $khaledOut + $mohammedOut + $waliOut;
-        
-        $newBalance = $totalIn - $totalOut;
+        // 1. Sum vouchers (Receipts - Payments)
+        $vouchersIn = Voucher::where('project_id', $project->id)->where('type', 'receipt')->sum('amount_ils');
+        $vouchersOut = Voucher::where('project_id', $project->id)->where('type', 'payment')->sum('amount_ils');
+        $balance += ($vouchersIn - $vouchersOut);
 
-        echo "Project: {$project->name} (ID: {$project->id})\n";
-        echo "  Old Balance: " . number_format($project->balance, 2) . "\n";
-        echo "  New Balance: " . number_format($newBalance, 2) . "\n";
+        // 2. Sum payments via contracts
+        $paymentsIn = Payment::whereHas('contract', function($q) use ($project) {
+            $q->where('project_id', $project->id);
+        })->where('type', 'in')->get()->sum(fn($p) => $p->amount * $p->exchange_rate);
 
-        $project->balance = $newBalance;
-        $project->save();
+        $paymentsOut = Payment::whereHas('contract', function($q) use ($project) {
+            $q->where('project_id', $project->id);
+        })->where('type', 'out')->get()->sum(fn($p) => $p->amount * $p->exchange_rate);
         
-        echo "  Status: Updated\n\n";
+        $balance += ($paymentsIn - $paymentsOut);
+
+        // 3. Sum project transfers
+        $transfersTo = ProjectTransfer::where('to_project_id', $project->id)->sum('amount');
+        $transfersFrom = ProjectTransfer::where('from_project_id', $project->id)->sum('amount');
+        $balance += ($transfersTo - $transfersFrom);
+
+        echo "Project: {$project->name} | Calculated Balance: {$balance}\n";
+
+        $project->update(['balance' => $balance]);
     }
+});
 
-    DB::commit();
-    echo "Reconciliation Completed Successfully!\n";
-} catch (\Exception $e) {
-    DB::rollBack();
-    echo "ERROR: " . $e->getMessage() . "\n";
-}
+echo "Synchronization complete.\n";

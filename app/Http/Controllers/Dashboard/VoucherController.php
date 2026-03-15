@@ -169,6 +169,16 @@ class VoucherController extends Controller
                 $toAccount->applyBalanceDelta((float) $this->getAmountInTargetCurrency($voucher, $toAccount->currency));
             }
         }
+
+        // تحديث رصيد المشروع إذا كان السند مرتبطاً بمشروع
+        if ($voucher->project_id) {
+            $project = Project::find($voucher->project_id);
+            if ($project) {
+                // سند القبض يزيد رصيد المشروع، سند الصرف ينقصه
+                $delta = ($voucher->type == 'receipt') ? $voucher->amount_ils : -$voucher->amount_ils;
+                $project->increment('balance', $delta);
+            }
+        }
     }
 
     protected function revertBalances(Voucher $voucher)
@@ -187,6 +197,15 @@ class VoucherController extends Controller
             if ($voucher->to_bank_account_id) {
                 $toAccount = BankAccount::findOrFail($voucher->to_bank_account_id);
                 $toAccount->applyBalanceDelta(-1 * (float) $this->getAmountInTargetCurrency($voucher, $toAccount->currency));
+            }
+        }
+
+        // عكس أثر رصيد المشروع if applicable
+        if ($voucher->project_id) {
+            $project = Project::find($voucher->project_id);
+            if ($project) {
+                $delta = ($voucher->type == 'receipt') ? -$voucher->amount_ils : $voucher->amount_ils;
+                $project->increment('balance', $delta);
             }
         }
     }

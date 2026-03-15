@@ -106,6 +106,18 @@ class PaymentController extends Controller
                 'transaction_reference'
             ]));
 
+            // تحديث رصيد المشروع إذا كان مرتبطاً بعقد
+            if ($payment->contract_id) {
+                $contract = Contract::find($payment->contract_id);
+                if ($contract && $contract->project_id) {
+                    $project = Project::find($contract->project_id);
+                    if ($project) {
+                        $delta = ($payment->type == 'in') ? ($payment->amount * $payment->exchange_rate) : -($payment->amount * $payment->exchange_rate);
+                        $project->increment('balance', $delta);
+                    }
+                }
+            }
+
             DB::commit();
             return redirect()->route('dashboard.payments.index')->with('success', 'تم تسجيل القيد بنجاح.');
         } catch (\Exception $e) {
@@ -167,10 +179,36 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            // 1. تحديث القيد الرئيسي
+            // 2. عكس الأثر القديم للمشروع قبل التحديث
+            if ($payment->contract_id) {
+                $oldContract = Contract::find($payment->contract_id);
+                if ($oldContract && $oldContract->project_id) {
+                    $oldProject = Project::find($oldContract->project_id);
+                    if ($oldProject) {
+                        $oldPaymentIls = $payment->getOriginal('amount') * $payment->getOriginal('exchange_rate');
+                        $oldDelta = ($payment->getOriginal('type') == 'in') ? -$oldPaymentIls : $oldPaymentIls;
+                        $oldProject->increment('balance', $oldDelta);
+                    }
+                }
+            }
+
+            // 3. تحديث القيد الرئيسي
             $payment->update($validated);
 
-            // 2. تحديث تفاصيل الدفع
+            // 4. تطبيق الأثر الجديد للمشروع
+            if ($payment->contract_id) {
+                $newContract = Contract::find($payment->contract_id);
+                if ($newContract && $newContract->project_id) {
+                    $newProject = Project::find($newContract->project_id);
+                    if ($newProject) {
+                        $newPaymentIls = $payment->amount * $payment->exchange_rate;
+                        $newDelta = ($payment->type == 'in') ? $newPaymentIls : -$newPaymentIls;
+                        $newProject->increment('balance', $newDelta);
+                    }
+                }
+            }
+
+            // 5. تحديث تفاصيل الدفع
             $details_data = $request->only([
                 'delivered_by', 'received_by', 'check_number', 'due_date',
                 'check_owner', 'sender_bank_account_id', 'receiver_bank_account_id',
@@ -220,6 +258,18 @@ class PaymentController extends Controller
     {
         $payment = Payment::onlyTrashed()->findOrFail($id);
         DB::transaction(function () use ($payment) {
+            // عكس الأثر المالي على المشروع قبل الحذف النهائي
+            if ($payment->contract_id) {
+                $contract = Contract::find($payment->contract_id);
+                if ($contract && $contract->project_id) {
+                    $project = Project::find($contract->project_id);
+                    if ($project) {
+                        $delta = ($payment->type == 'in') ? -($payment->amount * $payment->exchange_rate) : ($payment->amount * $payment->exchange_rate);
+                        $project->increment('balance', $delta);
+                    }
+                }
+            }
+
             $payment->details()->delete();
             $payment->forceDelete();
         });

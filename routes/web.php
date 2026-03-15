@@ -83,8 +83,7 @@ Route::prefix('bank-accounts')->name('bank-accounts.')->group(function () {
     });
 });
 // Fund Transfers Routes
-Route::get('/fund-transfers', [App\Http\Controllers\Dashboard\FundTransferController::class, 'index'])->name('fund-transfers.index');
-Route::post('/fund-transfers', [App\Http\Controllers\Dashboard\FundTransferController::class, 'store'])->name('fund-transfers.store');
+Route::resource('fund-transfers', App\Http\Controllers\Dashboard\FundTransferController::class)->parameters(['fund-transfers' => 'fundTransfer']);
 // Financial Accounts (Banks, Safes, Checks) Main Page
 Route::get('/financial-accounts', [App\Http\Controllers\Dashboard\FinancialAccountsController::class, 'index'])->name('financial-accounts.index');
 // Checks Management Routes
@@ -142,7 +141,6 @@ Route::prefix('dashboard/projects')->name('dashboard.projects.')->middleware(['a
     Route::resource('projects', App\Http\Controllers\Dashboard\ProjectController::class);
 
     // --- وحدات التحويلات ---
-    Route::resource('fund-transfers', App\Http\Controllers\Dashboard\FundTransferController::class)->only(['index', 'store']);
     Route::resource('project-transfers', App\Http\Controllers\Dashboard\ProjectTransferController::class)->middleware('auth');
 
  Route::get('/purchases', [App\Http\Controllers\Dashboard\PurchaseController::class, 'index'])->name('purchases.index');
@@ -245,7 +243,6 @@ Route::resource('supplier-expenses', \App\Http\Controllers\Dashboard\SupplierExp
     Route::resource('cash-safes', App\Http\Controllers\Dashboard\CashSafeController::class);
 
     Route::resource('receipt-vouchers', App\Http\Controllers\Dashboard\ReceiptVoucherController::class)->except(['show']);
-    Route::resource('fund-transfers', App\Http\Controllers\Dashboard\FundTransferController::class)->except(['show']);
     Route::resource('alerts', App\Http\Controllers\Dashboard\AlertController::class);
 // --- 5. المقاولون والموردون (Subcontractors) ---
 Route::get('subcontractors/trash', [App\Http\Controllers\Dashboard\SubcontractorController::class, 'trash'])->name('subcontractors.trash');

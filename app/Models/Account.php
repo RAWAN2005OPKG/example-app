@@ -9,7 +9,7 @@ class Account extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'code', 'type', 'parent_id', 'is_main', 'is_active'];
+protected $fillable = ['name', 'code', 'type', 'parent_id', 'is_main', 'is_active', 'running_balance'];
 
     // علاقة الحساب الأب
     public function parent()

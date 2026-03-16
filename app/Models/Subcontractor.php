@@ -18,11 +18,9 @@ class Subcontractor extends Model
     /**
      * علاقة "متعدد لمتعدد" مع المشاريع من خلال جدول العقود.
      */
-    public function contracts()
+  public function contracts()
     {
-        return $this->belongsToMany(Project::class, 'subcontractor_contracts')
-                    ->withPivot('id', 'contract_date', 'contract_value', 'currency', 'exchange_rate', 'contract_details')
-                    ->withTimestamps();
+        return $this->morphMany(Contract::class, 'contractable');
     }
 
     /**

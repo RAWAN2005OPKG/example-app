@@ -68,7 +68,6 @@ class ContractController extends Controller
 
             $attachmentPath = $request->hasFile('attachment') ? $request->file('attachment')->store('contracts', 'public') : null;
 
-
             $contractable->contracts()->create([
                 'unique_id' => 'CON-' . time(),
                 'project_id' => $validated['project_id'],
